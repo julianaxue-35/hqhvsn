@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>HQHVSN — Feline</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#F5F2EA;--card:#FFF;--ink:#1C2421;--ink2:#4A5550;--ink3:#8A9490;--line:#DDD8CA;--green:#1F4842;--amber:#C66A2A;--red:#8B2A1E;--teal:#2D6B62;--soft:#EDE8D6;--good:#3F7D5C;font-size:15px;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+input,select,textarea,button{font-family:inherit;}
+/* Layout */
+.wrap{max-width:860px;margin:0 auto;padding:12px 10px 60px;}
+/* Cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;}
+/* Section accordions */
+.sec{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none;gap:10px;}
+.sec-hdr h2{font-size:15px;font-weight:700;color:#FFF;margin:0;}
+.sec-hdr .arrow{color:rgba(255,255,255,.6);font-size:12px;transition:transform .2s;flex-shrink:0;}
+.sec-hdr.open .arrow{transform:rotate(180deg);}
+.sec-body{display:none;background:var(--card);padding:14px;}
+.sec-body.open{display:block;}
+/* Form elements */
+.fld{margin-bottom:12px;}
+.fld label,.lbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink2);margin-bottom:4px;}
+input[type=text],input[type=number],input[type=time],input[type=date],input[type=password],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;background:#FFFCF5;font-size:15px;color:var(--ink);outline:none;appearance:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(31,72,66,.12);}
+textarea{resize:vertical;min-height:90px;line-height:1.5;font-size:13px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+/* Buttons */
+btn,button{cursor:pointer;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.btn:hover{opacity:.88;}
+.btn-primary{background:var(--green);color:#FFF;}
+.btn-amber{background:var(--amber);color:#FFF;}
+.btn-soft{background:var(--soft);color:var(--ink);border:1px solid var(--line);}
+.btn-good{background:var(--good);color:#FFF;}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:6px;}
+.btn-full{width:100%;}
+/* Tick buttons */
+.tick{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:#FFFCF5;transition:all .15s;margin-bottom:7px;}
+.tick.done{background:var(--soft);border-color:var(--green);}
+.tick-box{width:18px;height:18px;border:2px solid var(--line);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:#FFF;}
+.tick.done .tick-box{background:var(--green);border-color:var(--green);}
+.tick-check{color:#FFF;font-size:11px;display:none;}
+.tick.done .tick-check{display:block;}
+.tick-lbl{font-size:13px;font-weight:600;color:var(--ink);}
+.tick-sub{font-size:11px;color:var(--ink2);margin-top:2px;}
+.tick-time{margin-left:auto;font-size:11px;font-weight:700;color:var(--green);white-space:nowrap;padding-left:8px;}
+/* Dose cards */
+.dose-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+.dose-card{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+.dose-card .d-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);margin-bottom:3px;}
+.dose-card .d-val{font-size:22px;font-weight:700;color:var(--green);}
+.dose-card .d-note{font-size:10px;color:var(--ink3);margin-top:2px;font-style:italic;}
+/* Sticky header */
+#sticky-hdr{position:sticky;top:0;z-index:100;background:var(--green);border-bottom:3px solid var(--amber);padding:9px 14px;display:none;}
+#sticky-hdr .sh-name{font-size:17px;font-weight:700;color:#FFF;}
+#sticky-hdr .sh-meta{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
+#sticky-hdr .sh-doses{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.sh-badge{background:rgba(255,255,255,.15);border-radius:6px;padding:4px 10px;text-align:center;}
+.sh-badge .sb-lbl{font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.4px;}
+.sh-badge .sb-val{font-size:15px;font-weight:700;color:#FFF;}
+/* Search screen */
+#search-screen{max-width:460px;margin:40px auto;padding:0 14px;}
+.ss-title{text-align:center;margin-bottom:24px;}
+.ss-title h1{font-size:24px;font-weight:700;color:var(--green);}
+.ss-title p{font-size:13px;color:var(--ink2);margin-top:4px;}
+.tab-bar{display:flex;gap:4px;margin-bottom:18px;}
+.tab-bar button{flex:1;padding:8px 4px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--ink);font-size:12px;font-weight:600;cursor:pointer;}
+.tab-bar button.active{background:var(--green);color:#FFF;border-color:var(--green);}
+/* Vitals table */
+#vitals-table{width:100%;border-collapse:collapse;font-size:13px;}
+#vitals-table th{background:var(--soft);padding:7px 6px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);border-bottom:1px solid var(--line);}
+#vitals-table td{padding:4px 4px;border-bottom:1px solid var(--line);vertical-align:middle;}
+#vitals-table input,#vitals-table select{padding:5px 6px;font-size:12px;min-width:0;}
+#vitals-table select{width:110px;}
+/* Checkbox */
+.chk-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;cursor:pointer;font-size:13px;color:var(--ink);margin-bottom:6px;background:#FFFCF5;}
+.chk-item input{width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;}
+/* Export box */
+#export-box{background:#F9F7F0;border:1px solid var(--line);border-radius:8px;padding:14px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;max-height:480px;overflow-y:auto;line-height:1.55;color:var(--ink);}
+/* Toast */
+#toast{position:fixed;top:14px;right:14px;z-index:999;padding:10px 18px;border-radius:8px;font-size:14px;font-weight:500;color:#FFF;display:none;max-width:300px;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+/* Patient list */
+.pt-item{padding:9px 12px;border:1px solid var(--line);border-radius:7px;margin-bottom:6px;cursor:pointer;font-size:14px;background:var(--soft);}
+.pt-item span{font-size:11px;color:var(--ink2);}
+/* Utils */
+.hidden{display:none!important;}
+.hint{font-size:11px;color:var(--ink3);margin-top:3px;font-style:italic;}
+.alert{border-left:3px solid;padding:9px 13px;border-radius:0 7px 7px 0;font-size:13px;margin:8px 0;line-height:1.5;}
+.alert-warn{background:#FEF3DC;border-color:var(--amber);color:#6B3800;}
+.alert-info{background:#E6F1FB;border-color:#1A5FA5;color:#0C3A6E;}
+hr{border:none;border-top:1px solid var(--line);margin:14px 0;}
+/* Cloud sync */
+.cloud-pill{font-size:10px;font-weight:700;color:#FFF;background:#8A9490;border-radius:10px;padding:3px 9px;white-space:nowrap;}
+.cloud-banner{background:#2D6B62;color:#FFF;border-radius:8px;padding:11px 13px;font-size:13px;font-weight:600;margin-bottom:10px;cursor:pointer;text-align:center;line-height:1.4;}
+/* EMERGENCY tool */
+#emg-fab{position:fixed;right:16px;bottom:16px;z-index:400;background:#8B2A1E;color:#FFF;border:none;border-radius:50px;padding:14px 22px;font-size:15px;font-weight:800;letter-spacing:.5px;box-shadow:0 4px 16px rgba(139,42,30,.5);cursor:pointer;display:none;align-items:center;gap:8px;animation:emgpulse 2s infinite;}
+@keyframes emgpulse{0%,100%{box-shadow:0 4px 16px rgba(139,42,30,.45);}50%{box-shadow:0 4px 28px rgba(139,42,30,.9);}}
+#emg-overlay{position:fixed;inset:0;z-index:500;background:rgba(20,10,8,.55);display:none;overflow-y:auto;}
+#emg-overlay.open{display:block;}
+.emg-sheet{max-width:760px;margin:0 auto;min-height:100%;background:var(--bg);}
+.emg-hdr{position:sticky;top:0;background:#8B2A1E;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;z-index:2;}
+.emg-hdr h2{font-size:18px;font-weight:800;color:#FFF;margin:0;letter-spacing:.5px;}
+.emg-body{padding:14px;}
+.emg-wt{margin-bottom:10px;}
+.emg-wt input{max-width:170px;}
+.abc{display:grid;gap:7px;margin:12px 0 14px;}
+.abc-item{background:#FFF;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px;line-height:1.45;color:var(--ink);}
+.abc-item b{color:var(--red);}
+.emg-scn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.emg-scn{padding:12px 11px;border:2px solid var(--line);border-radius:10px;background:#FFF;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left;}
+.emg-scn.active{border-color:#8B2A1E;background:#FBEDEA;}
+.emg-panel-title{font-size:16px;font-weight:800;margin:4px 0 10px;color:var(--ink);}
+.emg-section{margin-bottom:14px;}
+.emg-sec-h{font-size:13px;font-weight:700;color:#8B2A1E;margin:2px 0 8px;}
+.emg-action{display:block;width:100%;text-align:left;background:#FFF;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px;color:var(--ink);cursor:pointer;}
+.emg-action:active{background:var(--soft);}
+.emg-drug{background:#FFF;border:1px solid var(--line);border-radius:9px;padding:11px 12px;margin-bottom:8px;}
+.emg-drug-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px;}
+.emg-drug-name{font-size:14px;font-weight:700;color:var(--ink);}
+.emg-drug-dose{font-size:12px;color:var(--ink2);font-weight:600;}
+.emg-drug-calc{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:8px;background:var(--soft);border-radius:7px;padding:8px 10px;font-size:13px;}
+.emg-drug-calc input{width:74px;padding:5px 7px;}
+.emg-conc{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.3px;font-weight:700;}
+.emg-mg,.emg-ml{color:var(--green);font-weight:700;}
+.emg-drug-note{font-size:11px;color:var(--ink3);font-style:italic;margin-top:5px;line-height:1.4;}
+.emg-note{background:#FEF3DC;border-left:3px solid var(--amber);border-radius:0 7px 7px 0;padding:8px 11px;font-size:12.5px;margin-bottom:8px;line-height:1.5;color:#6B3800;}
+.emg-extra{background:#E6F1FB;border-left:3px solid #1A5FA5;border-radius:0 7px 7px 0;padding:9px 12px;font-size:12.5px;margin:8px 0;color:#0C3A6E;line-height:1.5;}
+.emg-log{background:#FFF;border:1px solid var(--line);border-radius:9px;padding:12px;margin-top:14px;}
+.emg-log-item{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.4;}
+.emg-log-item:last-child{border-bottom:none;}
+.emg-log-time{font-weight:700;color:#8B2A1E;white-space:nowrap;}
+.emg-disclaimer{font-size:11px;color:var(--ink3);font-style:italic;text-align:center;margin-top:12px;line-height:1.5;}
+@media(max-width:480px){.row2{grid-template-columns:1fr;}.row3{grid-template-columns:1fr 1fr;}.emg-scn-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- STICKY HEADER -->
+<div id="sticky-hdr">
+  <div style="max-width:860px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div class="sh-name" id="sh-name">—</div>
+        <div class="sh-meta" id="sh-meta"></div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <div class="sh-doses" id="sh-doses"></div>
+        <span id="cloud-pill" class="cloud-pill" title="Cloud sync status">· local only</span>
+        <button class="btn btn-sm" style="background:#8B2A1E;color:#FFF;font-weight:800;" onclick="openEmergency()" title="Emergency">🚨</button>
+        <button class="btn btn-sm" style="background:var(--amber);color:#FFF;" onclick="savePatient()">💾 Save</button>
+        <button class="btn btn-sm btn-soft" onclick="goSearch()">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMERGENCY FLOATING BUTTON -->
+<button id="emg-fab" onclick="openEmergency()">🚨 EMERGENCY</button>
+
+<!-- SEARCH SCREEN -->
+<div id="search-screen">
+  <div class="ss-title">
+    <h1>HQHVSN Workflow</h1>
+    <p>Feline Protocol · RSPCA Victoria</p>
+  </div>
+  <div class="card">
+    <div class="tab-bar">
+      <button class="active" onclick="switchTab('new',this)">New patient</button>
+      <button onclick="switchTab('load',this)">This device</button>
+      <button onclick="switchTab('import',this)">Import from Teams</button>
+    </div>
+
+    <div id="tab-new">
+      <div class="row2">
+        <div class="fld"><label>First name / shelter no.</label><input id="s-first" type="text" placeholder="e.g. Mochi or SC12345"></div>
+        <div class="fld"><label>Last name</label><input id="s-last" type="text" placeholder="e.g. Lee"></div>
+      </div>
+      <div class="fld"><label>Password</label><input id="s-pw" type="password" placeholder="Team password"></div>
+      <button class="btn btn-primary btn-full" onclick="createPatient()">Create new patient</button>
+    </div>
+
+    <div id="tab-load" class="hidden">
+      <div id="today-list"></div>
+      <div class="row2">
+        <div class="fld"><label>First name / shelter no.</label><input id="l-first" type="text" placeholder="e.g. Mochi or SC12345"></div>
+        <div class="fld"><label>Last name</label><input id="l-last" type="text" placeholder="e.g. Lee"></div>
+      </div>
+      <div class="fld"><label>Password</label><input id="l-pw" type="password" placeholder="Team password"></div>
+      <button class="btn btn-primary btn-full" onclick="loadPatient()">Load from this device</button>
+    </div>
+
+    <div id="tab-import" class="hidden">
+      <p style="font-size:13px;color:var(--ink2);margin-bottom:12px;line-height:1.5;">Paste the exported record text from Teams below, then enter the team password.</p>
+      <div class="fld"><label>Paste exported record</label><textarea id="i-text" placeholder="Paste the encrypted text from Teams here…" style="min-height:80px;font-size:11px;font-family:monospace;"></textarea></div>
+      <div class="fld"><label>Password</label><input id="i-pw" type="password" placeholder="Team password"></div>
+      <button class="btn btn-primary btn-full" onclick="importPatient()">Import record</button>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:11px;color:var(--ink3);margin-top:10px;">When the team cloud is set up, records sync live across devices and auto-clear after 24–48 h.<br>A copy is always saved on this device as a backup.</p>
+</div>
+
+<!-- PATIENT SCREEN -->
+<div id="patient-screen" class="hidden">
+  <div class="wrap">
+
+    <div id="cloud-banner" class="cloud-banner hidden" onclick="loadRemoteUpdate()">☁︎ This patient was updated on another device — tap to load the latest.</div>
+
+    <!-- 1. PATIENT & PRECHECK -->
+    <div class="sec" id="sec-precheck">
+      <div class="sec-hdr open" style="background:var(--green);" onclick="toggleSec('precheck')">
+        <h2>1 — Patient & Pre-op Examination</h2><span class="arrow">▼</span>
+      </div>
+      <div class="sec-body open">
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Patient details</div>
+          <div class="row2">
+            <div class="fld"><label>First name</label><input id="p-first" type="text"></div>
+            <div class="fld"><label>Last name</label><input id="p-last" type="text"></div>
+            <div class="fld"><label>Weight (kg)</label><input id="p-weight" type="number" step="0.1" placeholder="e.g. 3.5" oninput="updateDoses()"></div>
+            <div class="fld"><label>Sex</label><select id="p-sex" onchange="onSexChange()"><option value="">Select…</option><option>Male entire</option><option>Female entire</option></select></div>
+            <div class="fld"><label>Age (months)</label><input id="p-age" type="number" placeholder="e.g. 8"></div>
+            <div class="fld"><label>ASA</label><select id="p-asa"><option value="1">ASA 1 — Healthy</option><option value="2">ASA 2 — Mild systemic disease</option></select></div>
+            <div class="fld"><label>BCS category</label><select id="p-bcs-cat"><option value="normal">Normal (3–6/9)</option><option value="underweight">Underweight (≤2/9)</option><option value="overweight">Overweight (≥7/9)</option></select></div>
+            <div class="fld"><label>BCS score (1–9)</label><input id="p-bcs" type="number" min="1" max="9" placeholder="e.g. 5"></div>
+            <div class="fld"><label>Vet</label><select id="p-vet" onchange="document.getElementById('p-vet-other-row').classList.toggle('hidden',this.value!=='Other')"><option value="JX">JX</option><option value="SI">SI</option><option value="AS">AS</option><option value="Other">Other</option></select></div>
+            <div class="fld hidden" id="p-vet-other-row"><label>Vet name</label><input id="p-vet-other" type="text" placeholder="Name"></div>
+            <div class="fld"><label>Nurse</label><input id="p-nurse" type="text" placeholder="Nurse name(s)"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Physical examination</div>
+          <div class="row2">
+            <div class="fld"><label>HR (bpm)</label><input id="p-hr" type="number" placeholder="e.g. 180"></div>
+            <div class="fld"><label>Respiratory sounds</label><select id="p-rr"><option value="Normal bronchovesicular sounds">Normal bronchovesicular sounds</option><option value="Tachypnoea">Tachypnoea</option><option value="Increased respiratory effort">Increased respiratory effort</option></select></div>
+            <div class="fld"><label>MM colour</label><select id="p-mm"><option value="Pink">Pink</option><option value="Pale pink">Pale pink</option><option value="Pale">Pale</option><option value="Injected">Injected</option><option value="Cyanotic">Cyanotic</option></select></div>
+            <div class="fld"><label>CRT</label><select id="p-crt"><option value="&lt;2s">&lt;2s</option><option value="2s">2s</option><option value="2–3s">2–3s</option><option value="&gt;3s">&gt;3s</option></select></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Cardiac auscultation</div>
+          <label class="chk-item"><input type="checkbox" id="ca-murmur" onchange="onMurmurChange()"> Heart murmur</label>
+          <div class="fld hidden" id="murmur-grade-row" style="margin-top:8px;"><label>Murmur grade</label><select id="ca-murmur-grade"><option value="1">Grade 1/6 — very soft</option><option value="2">Grade 2/6 — soft</option><option value="3">Grade 3/6 — moderate</option><option value="4">Grade 4/6 — loud + thrill</option><option value="5">Grade 5/6 — very loud + thrill</option><option value="6">Grade 6/6 — palpable off-chest</option></select></div>
+          <div class="alert alert-warn hidden" id="murmur-warn" style="margin-top:8px;"><strong>Heart murmur auscultated:</strong> watch for fluid overload and increased risk under GA.</div>
+          <label class="chk-item" style="margin-top:7px;"><input type="checkbox" id="ca-gallop"> Gallop rhythm</label>
+          <label class="chk-item"><input type="checkbox" id="ca-arrhythmia"> Arrhythmia</label>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Palpation findings <span style="font-weight:400;font-style:italic;">(for owner discussion)</span></div>
+          <div id="pal-male" class="hidden">
+            <label class="chk-item"><input type="checkbox" id="pal-2t"> 2 testes palpated</label>
+            <label class="chk-item"><input type="checkbox" id="pal-crypto"> Cryptorchid</label>
+          </div>
+          <div id="pal-female" class="hidden">
+            <label class="chk-item"><input type="checkbox" id="pal-preg" onchange="document.getElementById('preg-stage-row').classList.toggle('hidden',!this.checked)"> Pregnant</label>
+            <div class="fld hidden" id="preg-stage-row" style="margin-top:7px;"><label>Pregnancy stage</label><select id="pal-preg-stage"><option value="1">Stage 1 (&lt;3 weeks)</option><option value="2">Stage 2 (3–6 weeks)</option><option value="3">Stage 3 (&gt;6 weeks)</option></select></div>
+          </div>
+          <p class="hint" id="pal-sexhint">Select the patient's sex above to show relevant palpation findings.</p>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Health check findings</div>
+          <div class="row2">
+            <label class="chk-item"><input type="checkbox" id="hc-furi" onchange="onFuriChange()"> FURI signs</label>
+            <label class="chk-item"><input type="checkbox" id="hc-dental"> Dental disease</label>
+            <label class="chk-item"><input type="checkbox" id="hc-skin"> Skin disease / wound</label>
+            <label class="chk-item"><input type="checkbox" id="hc-fad"> Flea allergy dermatitis</label>
+            <label class="chk-item"><input type="checkbox" id="hc-ear"> Ear infection</label>
+          </div>
+          <div class="alert alert-warn hidden" id="furi-warn" style="margin-top:8px;"><strong>FURI signs noted:</strong> consider rescheduling if the patient is exhibiting moderate–severe FURI signs. Disinfect all equipment between patients.</div>
+          <div class="fld" style="margin-top:6px;"><label>Other findings / notes</label><textarea id="hc-notes" placeholder="Any additional findings, owner concerns…" style="min-height:60px;"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DRUG DOSES -->
+    <div class="sec" id="sec-doses">
+      <div class="sec-hdr" style="background:var(--teal);" onclick="toggleSec('doses')">
+        <h2>2 — Drug Dose Reference</h2><span class="arrow">▼</span>
+      </div>
+      <div class="sec-body">
+        <div id="dose-display"><p style="text-align:center;padding:20px;color:var(--ink3);">Enter weight in Section 1 to calculate doses.</p></div>
+        <p class="hint" style="margin-top:8px;">All doses from HQHVSN Prevention and Outreach Team Protocol. Always verify before administering.</p>
+      </div>
+    </div>
+
+    <!-- 3. PRE-OP TIMELINE -->
+    <div class="sec" id="sec-preop">
+      <div class="sec-hdr open" style="background:var(--amber);" onclick="toggleSec('preop')">
+        <h2>3 — Pre-op & Set-up Timeline</h2><span class="arrow">▼</span>
+      </div>
+      <div class="sec-body open">
+        <p class="hint" style="margin-bottom:10px;">Tap each item when done — time is recorded automatically.</p>
+        <div class="row2">
+          <div id="tick-zmd" class="tick" onclick="toggleTick('zmd')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">ZMD given IM</div><div class="tick-sub" id="tick-zmd-sub">—</div></div><div class="tick-time hidden" id="tick-zmd-time"></div></div>
+          <div id="tick-microchip" class="tick" onclick="toggleTick('microchip')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Microchip implanted</div></div><div class="tick-time hidden" id="tick-microchip-time"></div></div>
+          <div id="tick-vacc" class="tick" onclick="toggleTick('vacc')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Vaccination given</div></div><div class="tick-time hidden" id="tick-vacc-time"></div></div>
+          <div id="tick-bladder" class="tick" onclick="toggleTick('bladder')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Bladder expressed</div></div><div class="tick-time hidden" id="tick-bladder-time"></div></div>
+          <div id="tick-ivc" class="tick" onclick="toggleTick('ivc')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">IV catheter placed</div></div><div class="tick-time hidden" id="tick-ivc-time"></div></div>
+          <div id="tick-intubation" class="tick" onclick="toggleTick('intubation')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Intubation</div></div><div class="tick-time hidden" id="tick-intubation-time"></div></div>
+          <div id="tick-metoclopramide" class="tick" onclick="toggleTick('metoclopramide')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Metoclopramide SC</div><div class="tick-sub" id="tick-metoclopramide-sub">—</div></div><div class="tick-time hidden" id="tick-metoclopramide-time"></div></div>
+          <div id="tick-alfax-pre" class="tick" onclick="toggleTick('alfax-pre')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Alfaxalone IV (if light)</div><div class="tick-sub" id="tick-alfax-pre-sub">—</div></div><div class="tick-time hidden" id="tick-alfax-pre-time"></div></div>
+        </div>
+        <div id="preop-extras" style="margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <!-- 4. SURGERY -->
+    <div class="sec" id="sec-surgery">
+      <div class="sec-hdr open" style="background:var(--red);" onclick="toggleSec('surgery')">
+        <h2>4 — Surgical Procedure</h2><span class="arrow">▼</span>
+      </div>
+      <div class="sec-body open">
+        <div class="card">
+          <div class="row2">
+            <div class="fld"><label>Procedure</label>
+              <select id="surg-type" onchange="onProcChange()">
+                <option value="castrate">Routine Castration</option>
+                <option value="cryptorchid">Cryptorchid Castration</option>
+                <option value="spey" selected>Routine Spey (OVH)</option>
+                <option value="preg1">Pregnant Spey — Stage 1</option>
+                <option value="preg2">Pregnant Spey — Stage 2</option>
+                <option value="preg3">Pregnant Spey — Stage 3</option>
+                <option value="pyometra">Pyometra OVH</option>
+              </select>
+            </div>
+          </div>
+          <div class="row2" style="margin-top:4px;">
+            <div class="fld"><label>Surgery start</label><div style="display:flex;gap:6px;"><input id="surg-start" type="time" style="flex:1;"><button class="btn btn-sm btn-soft" onclick="document.getElementById('surg-start').value=nowTime()">Now</button></div></div>
+            <div class="fld"><label>Surgery end</label><div style="display:flex;gap:6px;"><input id="surg-end" type="time" style="flex:1;"><button class="btn btn-sm btn-soft" onclick="document.getElementById('surg-end').value=nowTime()">Now</button></div></div>
+          </div>
+        </div>
+
+        <!-- Cryptorchid options -->
+        <div class="card hidden" id="crypto-opts">
+          <div class="lbl" style="margin-bottom:8px;color:var(--amber);">Cryptorchid details</div>
+          <div class="fld"><label>Retained side</label>
+            <select id="crypto-side" onchange="onCryptoChange()">
+              <option value="left">Left only</option><option value="right">Right only</option><option value="both">Bilateral</option>
+            </select>
+          </div>
+          <div class="row2">
+            <div class="fld" id="crypto-loc-left-row"><label>Left testicle location</label><select id="crypto-loc-left"><option value="inguinal">Inguinal region</option><option value="abdominal">Abdomen</option></select></div>
+            <div class="fld hidden" id="crypto-loc-right-row"><label>Right testicle location</label><select id="crypto-loc-right"><option value="inguinal">Inguinal region</option><option value="abdominal">Abdomen</option></select></div>
+          </div>
+          <div id="crypto-contra-row"><label class="chk-item"><input type="checkbox" id="crypto-contra" checked> Contralateral descended testicle — removed via scrotal incision</label></div>
+          <div style="margin-top:8px;"><button class="btn btn-sm btn-soft" onclick="insertTemplate()">↺ Regenerate surgical notes</button></div>
+        </div>
+
+        <!-- Closure options -->
+        <div class="card hidden" id="closure-opts">
+          <div class="lbl" style="margin-bottom:8px;">Closure options</div>
+          <label class="chk-item"><input type="checkbox" id="sc-layer" onchange="insertTemplate()"> Subcutaneous layer closed (3/0 PDS continuous)</label>
+          <p class="hint">Ticking this auto-updates the surgical notes below.</p>
+        </div>
+
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Surgical notes</div>
+          <button class="btn btn-sm btn-soft" style="margin-bottom:8px;" onclick="insertTemplate()">Insert template</button>
+          <textarea id="surg-notes" style="min-height:180px;font-family:monospace;font-size:13px;" placeholder="Tap 'Insert template' or type notes…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. INTRAOP -->
+    <div class="sec" id="sec-intraop">
+      <div class="sec-hdr open" style="background:#5B4F3A;" onclick="toggleSec('intraop')">
+        <h2>5 — Intraoperative Monitoring</h2><span class="arrow">▼</span>
+      </div>
+      <div class="sec-body open">
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Intraoperative medications</div>
+          <div id="tick-bupi-ip" class="tick hidden" onclick="toggleTick('bupi-ip')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Bupivacaine IP splash</div><div class="tick-sub" id="tick-bupi-ip-sub">2mg/kg intraperitoneal</div></div><div class="tick-time hidden" id="tick-bupi-ip-time"></div></div>
+          <div id="tick-alfax-intra" class="tick" onclick="toggleTick('alfax-intra')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Alfaxalone top-up</div><div class="tick-sub" id="tick-alfax-intra-sub">—</div></div><div class="tick-time hidden" id="tick-alfax-intra-time"></div></div>
+          <div class="fld hidden" id="alfax-intra-ml-row" style="margin-top:6px;"><label>Alfaxalone top-up given (mL)</label><input id="alfax-intra-ml" type="number" step="0.01" inputmode="decimal" placeholder="mL actually given" oninput="window._alfaxIntraMl=this.value"></div>
+          <div class="fld" style="margin-top:8px;"><label>Isoflurane / anaesthetic adjustments</label><input id="iso-notes" type="text" placeholder="e.g. Iso increased to 2.5% at 10:15"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div class="lbl" style="margin:0;">Vital signs — every 5 min</div>
+            <button class="btn btn-sm btn-soft" onclick="addVitalsRow()">+ Add reading</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table id="vitals-table">
+              <thead><tr><th>Time</th><th>HR</th><th>RR</th><th>SpO₂</th><th>BP (sys/dia MAP)</th><th>Depth</th><th></th></tr></thead>
+              <tbody id="vitals-body"></tbody>
+            </table>
+          </div>
+          <p id="vitals-empty" style="text-align:center;padding:16px;color:var(--ink3);font-size:13px;">No readings yet. Tap + Add reading.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. POST-OP -->
+    <div class="sec" id="sec-postop">
+      <div class="sec-hdr open" style="background:var(--good);" onclick="toggleSec('postop')">
+        <h2>6 — Post-op & Recovery</h2><span class="arrow">▼</span>
+      </div>
+      <div class="sec-body open">
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Post-op procedures</div>
+          <div id="tick-tattoo" class="tick" onclick="toggleTick('tattoo')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Tattoo — left ear</div></div><div class="tick-time hidden" id="tick-tattoo-time"></div></div>
+          <div id="tick-atipamezole" class="tick" onclick="toggleTick('atipamezole')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Atipamezole IM (reversal)</div><div class="tick-sub" id="tick-atipamezole-sub">—</div></div><div class="tick-time hidden" id="tick-atipamezole-time"></div></div>
+          <div id="tick-melox-sc" class="tick" onclick="toggleTick('melox-sc')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Meloxicam SC</div><div class="tick-sub" id="tick-melox-sc-sub">—</div></div><div class="tick-time hidden" id="tick-melox-sc-time"></div></div>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Buprenorphine (optional)</div>
+          <div id="tick-buprenorphine" class="tick" onclick="toggleTick('buprenorphine')"><div class="tick-box"><span class="tick-check">✓</span></div><div><div class="tick-lbl">Buprenorphine given</div><div class="tick-sub" id="tick-buprenorphine-sub">—</div></div><div class="tick-time hidden" id="tick-buprenorphine-time"></div></div>
+          <div class="fld hidden" id="buprenorphine-route-row" style="margin-top:8px;"><label>Route</label><select id="buprenorphine-route"><option value="IV">IV — intravenous</option><option value="IM">IM — intramuscular</option><option value="SC" selected>SC — subcutaneous</option><option value="TM">TM — transmucosal</option></select></div>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Post-op vitals</div>
+          <div class="row3">
+            <div class="fld"><label>Temp post-op (°C)</label><input id="p-temp-post" type="number" step="0.1" placeholder="e.g. 36.8"></div>
+            <div class="fld"><label>MM colour</label><select id="p-mm-post"><option>Pink</option><option>Pale pink</option><option>Pale</option><option>Injected</option></select></div>
+            <div class="fld"><label>CRT</label><select id="p-crt-post"><option value="&lt;2s">&lt;2s</option><option value="2s">2s</option><option value="2–3s">2–3s</option><option value="&gt;3s">&gt;3s</option></select></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Oral meloxicam send-home (optional)</div>
+          <label class="chk-item"><input type="checkbox" id="melox-oral-chk" onchange="document.getElementById('melox-oral-opts').classList.toggle('hidden',!this.checked);updateOralMelox();"> Oral meloxicam prescribed for home</label>
+          <div class="hidden" id="melox-oral-opts">
+            <div class="fld" style="margin-top:10px;"><label>Timing</label><select id="melox-timing" onchange="updateOralMelox()"><option value="AM">Morning (AM)</option><option value="PM">Evening (PM)</option></select></div>
+            <div id="melox-oral-instr" style="background:var(--soft);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;line-height:1.7;margin-top:8px;color:var(--ink);"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:8px;">Recovery notes</div>
+          <textarea id="recovery-notes" placeholder="Time to extubation, time to sternal, complications, owner instructions…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. EXPORT -->
+    <div class="sec" id="sec-export">
+      <div class="sec-hdr" style="background:#3A3A3A;" onclick="toggleSec('export')">
+        <h2>7 — Export for ezyVet / Teams</h2><span class="arrow">▼</span>
+      </div>
+      <div class="sec-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-primary" onclick="copyExport()">📋 Copy for ezyVet</button>
+          <button class="btn" style="background:var(--teal);color:#FFF;" onclick="shareToTeams()">💬 Share to Teams</button>
+          <button class="btn btn-soft" onclick="exportRecord()">📤 Export record (share with another nurse)</button>
+        </div>
+        <div class="alert alert-info" style="margin-bottom:10px;">
+          <strong>Dictation tip:</strong> iPhone — tap mic on keyboard · Android — tap mic on Gboard · Mac — press Fn twice · Windows — press Win+H
+        </div>
+        <div id="export-box"></div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+</div><!-- /patient-screen -->
+
+<!-- EMERGENCY OVERLAY -->
+<div id="emg-overlay">
+  <div class="emg-sheet">
+    <div class="emg-hdr">
+      <h2>🚨 EMERGENCY</h2>
+      <button class="btn btn-sm btn-soft" onclick="closeEmergency()">✕ Resume documentation</button>
+    </div>
+    <div class="emg-body">
+      <div class="emg-wt fld">
+        <label>Body weight (kg)</label>
+        <input id="emg-weight" type="number" step="0.1" inputmode="decimal" placeholder="kg" oninput="setEmgWeight(this.value)">
+        <span class="hint">Pre-filled from the patient · edit freely — this will not change the saved record.</span>
+      </div>
+      <div class="abc">
+        <div class="abc-item"><b>A — Airway:</b> turn vaporiser <b>OFF</b> · secure airway / intubate · check ET tube placement &amp; patency</div>
+        <div class="abc-item"><b>B — Breathing:</b> 100% O₂ · begin manual IPPV 10–15 mL/kg, 8–12 breaths/min (10/min during CPR)</div>
+        <div class="abc-item"><b>C — Circulation:</b> place IV catheter (IVC) to secure circulation · start fluids · <b>begin CPR if pulseless</b></div>
+        <div class="abc-item" style="border-color:var(--amber)"><b>Call for help · assign roles</b></div>
+      </div>
+      <div class="emg-scn-grid" id="emg-scn-grid"></div>
+      <div id="emg-panel"></div>
+      <div class="emg-log">
+        <div class="lbl" style="margin-bottom:8px;">Emergency event log</div>
+        <div id="emg-log-list"></div>
+      </div>
+      <div class="emg-disclaimer">Verify drug, dose &amp; concentration before administering — vet-directed.<br>Doses aligned with RECOVER 2024 / AAHA via the ABVP study hub.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase (cloud sync) — optional. The app runs local-only until FIREBASE_CONFIG below is filled in. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+'use strict';
+
+// ── STATE ──────────────────────────────────────────────────────────────
+var ST = {
+  patientId: null,
+  password: null,
+  date: null,
+  ticks: {}, // key → {done, time}
+  vitals: [],
+  emergency: [],   // [{time, text}] — emergency event log
+  emgConc: {},     // drug key → entered concentration (mg/mL or U/mL)
+  emgWeight: '',
+  emgScenario: null,
+  exportText: ''
+};
+
+// ── HELPERS ────────────────────────────────────────────────────────────
+function nowTime(){var n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function nowDate(){var n=new Date();return String(n.getDate()).padStart(2,'0')+'/'+String(n.getMonth()+1).padStart(2,'0')+'/'+n.getFullYear();}
+function tomorrowDate(){var n=new Date();n.setDate(n.getDate()+1);return String(n.getDate()).padStart(2,'0')+'/'+String(n.getMonth()+1).padStart(2,'0')+'/'+n.getFullYear();}
+function val(id){var e=document.getElementById(id);return e?e.value:'';}
+function chk(id){var e=document.getElementById(id);return e?e.checked:false;}
+function set(id,v){var e=document.getElementById(id);if(e)e.value=v;}
+function setChk(id,v){var e=document.getElementById(id);if(e)e.checked=v;}
+function show(id){var e=document.getElementById(id);if(e)e.classList.remove('hidden');}
+function hide(id){var e=document.getElementById(id);if(e)e.classList.add('hidden');}
+function flash(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.style.background=type==='danger'?'#8B2A1E':'#3F7D5C';t.style.display='block';setTimeout(function(){t.style.display='none';},2800);}
+
+// ── SECTIONS ───────────────────────────────────────────────────────────
+function toggleSec(id){
+  var body=document.querySelector('#sec-'+id+' .sec-body');
+  var hdr=document.querySelector('#sec-'+id+' .sec-hdr');
+  if(!body)return;
+  var open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  hdr.classList.toggle('open',!open);
+}
+
+// ── EXAM FINDINGS ──────────────────────────────────────────────────────
+function onSexChange(){
+  var sex=val('p-sex');
+  var male=sex.indexOf('Male')===0, female=sex.indexOf('Female')===0;
+  document.getElementById('pal-male').classList.toggle('hidden',!male);
+  document.getElementById('pal-female').classList.toggle('hidden',!female);
+  document.getElementById('pal-sexhint').classList.toggle('hidden',male||female);
+  updateDoses();
+}
+function onMurmurChange(){
+  var on=chk('ca-murmur');
+  document.getElementById('murmur-grade-row').classList.toggle('hidden',!on);
+  document.getElementById('murmur-warn').classList.toggle('hidden',!on);
+}
+function onFuriChange(){
+  document.getElementById('furi-warn').classList.toggle('hidden',!chk('hc-furi'));
+}
+
+// ── DRUG CALCULATIONS ──────────────────────────────────────────────────
+function calcDoses(w){
+  w=parseFloat(w);
+  if(!w||w<=0||isNaN(w))return null;
+  var zml=+(w*0.045).toFixed(2);
+  return {
+    weight:w, zml:zml,
+    meto:+(w/10).toFixed(2),
+    alfLow:+(w*0.1).toFixed(2), alfHigh:+(w*0.5).toFixed(2),
+    bupi:+(w*0.4).toFixed(2),
+    meloxSC:+(w*0.04).toFixed(2), meloxOral:+(w/10).toFixed(2),
+    atip:+(zml/2).toFixed(2),
+    bupren:+(w*0.0667).toFixed(2)
+  };
+}
+
+function updateDoses(){
+  var d=calcDoses(val('p-weight'));
+  var disp=document.getElementById('dose-display');
+  if(!d){disp.innerHTML='<p style="text-align:center;padding:20px;color:var(--ink3);">Enter weight in Section 1 to calculate doses.</p>';updateStickyHeader();return;}
+  // Update tick sublabels
+  var e;
+  if((e=document.getElementById('tick-zmd-sub')))e.textContent=d.zml+'mL IM';
+  if((e=document.getElementById('tick-metoclopramide-sub')))e.textContent=d.meto+'mL SC (5mg/mL)';
+  if((e=document.getElementById('tick-alfax-pre-sub')))e.textContent=d.alfLow+'–'+d.alfHigh+'mL slow IV';
+  if((e=document.getElementById('tick-alfax-intra-sub')))e.textContent=d.alfLow+'–'+d.alfHigh+'mL slow IV';
+  if((e=document.getElementById('tick-bupi-ip-sub')))e.textContent=d.bupi+'mL (2mg/kg, 5mg/mL)';
+  if((e=document.getElementById('tick-atipamezole-sub')))e.textContent=d.atip+'mL IM (5mg/mL)';
+  if((e=document.getElementById('tick-melox-sc-sub')))e.textContent=d.meloxSC+'mL SC (5mg/mL)';
+  if((e=document.getElementById('tick-buprenorphine-sub')))e.textContent=d.bupren+'mL (300mcg/mL)';
+
+  var proc=val('surg-type');
+  var hasBupi=proc!=='castrate';
+  var rows=[
+    {l:'ZMD (IM)',v:d.zml,n:'Zoletil + Methadone + Medetomidine · 0.045mL/kg'},
+    {l:'Metoclopramide (SC)',v:d.meto,n:'5mg/mL · wt÷10'},
+    {l:'Alfaxalone IV (PRN)',v:d.alfLow+'–'+d.alfHigh,n:'1–5mg/kg slow IV'},
+    hasBupi?{l:'Bupivacaine IP',v:d.bupi,n:'5mg/mL · 2mg/kg'}:null,
+    {l:'Meloxicam SC',v:d.meloxSC,n:'5mg/mL · 0.2mg/kg'},
+    {l:'Atipamezole (IM)',v:d.atip,n:'5mg/mL · ½ ZMD volume'},
+    {l:'Buprenorphine (PRN)',v:d.bupren,n:'300mcg/mL · 0.02mg/kg'},
+  ].filter(Boolean);
+  var zmdWarn='';
+  if(d.weight>4.5){
+    var isMale=(val('p-sex')||'').indexOf('Male')===0;
+    zmdWarn='<div class="alert alert-warn" style="margin-top:10px;"><strong>⚠ Large cat ('+d.weight+'kg) — ZMD caution'+(isMale?' (male/castrate)':'')+':</strong> 0.045 mL/kg calculates '+d.zml+' mL, but a full dose is often <em>too much</em> for cats over ~4.5–5 kg. Consider capping at <strong>0.18–0.20 mL</strong> depending on temperament — full dose risks prolonged recovery, apnoea and a cyanotic tongue.</div>';
+  }
+  disp.innerHTML='<div class="dose-grid">'+rows.map(function(r){return '<div class="dose-card"><div class="d-lbl">'+r.l+'</div><div class="d-val">'+r.v+'<span style="font-size:13px;font-weight:400;">mL</span></div><div class="d-note">'+r.n+'</div></div>';}).join('')+'</div>'+zmdWarn;
+
+  updateStickyHeader();
+  updateOralMelox();
+}
+
+function updateStickyHeader(){
+  var first=val('p-first'),last=val('p-last'),wt=val('p-weight'),sex=val('p-sex');
+  var d=calcDoses(wt);
+  document.getElementById('sh-name').textContent=(first||'—')+' '+(last||'');
+  document.getElementById('sh-meta').textContent=(wt?wt+'kg · ':'')+sex+' · '+(ST.date||'');
+  var bd=document.getElementById('sh-doses');
+  if(d){
+    var proc=val('surg-type');
+    var hasBupi=proc!=='castrate';
+    bd.innerHTML=[
+      {l:'ZMD',v:d.zml},{l:'Atip.',v:d.atip},{l:'Melox SC',v:d.meloxSC},
+      hasBupi?{l:'Bupi IP',v:d.bupi}:null
+    ].filter(Boolean).map(function(x){return '<div class="sh-badge"><div class="sb-lbl">'+x.l+'</div><div class="sb-val">'+x.v+'mL</div></div>';}).join('');
+  }else{bd.innerHTML='';}
+}
+
+function updateOralMelox(){
+  var chkEl=document.getElementById('melox-oral-chk');
+  if(!chkEl||!chkEl.checked)return;
+  var d=calcDoses(val('p-weight'));
+  var t=val('melox-timing')||'AM';
+  var instr=document.getElementById('melox-oral-instr');
+  if(instr&&d){
+    instr.textContent='MELOXICAM oral suspension 0.5mg/mL\nGive '+d.meloxOral+'mL orally in the '+t+' ONCE daily WITH FOOD for 4 days.\nStart: '+tomorrowDate()+', '+t+'\nSTOP if signs of vomiting, diarrhoea and/or not eating.';
+  }
+}
+
+// ── SURGERY TEMPLATES ──────────────────────────────────────────────────
+function buildTemplate(){
+  var proc=val('surg-type');
+  var sc=chk('sc-layer');
+  var scLine=sc?'Closed subcutaneous layer with 3/0 PDS in a continuous suture pattern.\n':'';
+  var close='Closed muscle layer with 3/0 PDS in a continuous suture pattern.\n'+scLine+'Closed skin layer with 3/0 PDS in an intradermal suture pattern.';
+
+  if(proc==='castrate')return 'Surgical Procedure:\nRoutine Castration.\nSingle scrotal incisions made and testicles exteriorised.\nPedicle tie performed over both spermatic cords.\nIncisions left open to drain and heal by second intention.';
+
+  if(proc==='cryptorchid'){
+    var side=val('crypto-side');
+    var locL=val('crypto-loc-left')||'inguinal';
+    var locR=val('crypto-loc-right')||'inguinal';
+    var contra=chk('crypto-contra');
+    var t='Surgical Procedure:\n';
+    if(side==='both'){
+      t+='Bilateral cryptorchid castration.\n';
+      t+='Castration of retained left testicle '+(locL==='abdominal'?'in the abdomen':'in the inguinal region')+'.\n';
+      t+='Castration of retained right testicle '+(locR==='abdominal'?'in the abdomen':'in the inguinal region')+'.\n';
+      if(locL==='abdominal'||locR==='abdominal')t+='Ventral abdominal midline approach, routine celiotomy performed.\n';
+      else t+='Inguinal incisions made bilaterally.\n';
+      t+='Both testicles exteriorised and spermatic cords ligated.\n';
+    } else {
+      var s=side==='left'?'left':'right';
+      var loc=side==='left'?locL:locR;
+      t+='Castration of retained '+s+' testicle '+(loc==='abdominal'?'in the abdomen':'in the inguinal region')+'.\n';
+      if(loc==='abdominal')t+='Ventral abdominal midline approach, routine celiotomy performed.\n';
+      else t+='Inguinal incision made on the '+s+' side.\n';
+      t+='Exteriorised testicle.\nLigated spermatic cord.\n';
+      if(contra){var other=s==='left'?'right':'left';t+='Contralateral ('+other+') descended testicle removed via standard scrotal incision. Incision left open to drain and heal by second intention.\n';}
+    }
+    return t+close;
+  }
+
+  if(proc==='spey')return 'Surgical Procedure:\nRoutine midline spey performed, pedicle ties performed over both ovaries, cervix is ligated with 3/0 PDS and the uterus is removed.\n'+close;
+
+  if(proc==='preg1')return 'Surgical Procedure:\nEn bloc ovariohysterectomy performed. Stage 1 pregnancy confirmed on examination.\nPedicle ties performed over both ovaries. Cervix ligated with 3/0 PDS and the uterus removed en bloc with foetal contents intact.\nVascular clamps applied to the uterine pedicles following removal. Clamps left in situ for a minimum of 30 minutes post removal to ensure humane euthanasia of the foetuses.\nFoetal sac removed.\n'+close;
+
+  if(proc==='preg2')return 'Surgical Procedure:\nEn bloc ovariohysterectomy performed. Stage 2 pregnancy confirmed on examination (mid gestation).\nExtended midline incision performed. Careful handling of the enlarged uterus.\nPedicle ties performed over both ovaries. Cervix ligated with 3/0 PDS and the uterus removed en bloc with foetal contents intact.\nVascular clamps applied to the uterine pedicles following removal. Clamps left in situ for a minimum of 30 minutes post removal to ensure humane euthanasia of the foetuses.\nFoetal sac removed.\n'+close;
+
+  if(proc==='preg3')return 'Surgical Procedure:\nEn bloc ovariohysterectomy performed. Stage 3 pregnancy confirmed on examination (late gestation).\nSignificantly extended midline incision performed. High-risk procedure — careful exteriorisation to prevent uterine rupture.\nPedicle ties performed over both ovaries. Cervix ligated with 3/0 PDS and the uterus removed en bloc with foetal contents intact.\nVascular clamps applied to the uterine pedicles following removal. Clamps left in situ for a minimum of 30 minutes post removal to ensure humane euthanasia of the foetuses.\nFoetal sac removed.\n'+close;
+
+  if(proc==='pyometra')return 'Surgical Procedure:\nOvariohysterectomy performed for pyometra.\nExtended midline incision performed. Careful handling of the distended uterus to prevent rupture.\nPedicle ties performed over both ovaries. Cervix ligated with 3/0 PDS and the uterus removed.\n'+close;
+
+  return '';
+}
+
+function insertTemplate(){document.getElementById('surg-notes').value=buildTemplate();}
+
+function onProcChange(){
+  var proc=val('surg-type');
+  var isCastrate=proc==='castrate';
+  var isCrypto=proc==='cryptorchid';
+  var hasBupi=!isCastrate;
+  // Show/hide cryptorchid options
+  document.getElementById('crypto-opts').classList.toggle('hidden',!isCrypto);
+  // Show/hide closure options (not for castrate)
+  document.getElementById('closure-opts').classList.toggle('hidden',isCastrate);
+  // Show/hide bupivacaine tick
+  document.getElementById('tick-bupi-ip').classList.toggle('hidden',!hasBupi);
+  // Regenerate template
+  insertTemplate();
+  updateDoses();
+}
+
+function onCryptoChange(){
+  var side=val('crypto-side');
+  document.getElementById('crypto-loc-left-row').classList.toggle('hidden',side==='right');
+  document.getElementById('crypto-loc-right-row').classList.toggle('hidden',side==='left');
+  document.getElementById('crypto-contra-row').classList.toggle('hidden',side==='both');
+  insertTemplate();
+}
+
+// ── TICK BUTTONS ───────────────────────────────────────────────────────
+function toggleTick(key){
+  if(!ST.ticks[key])ST.ticks[key]={done:false,time:''};
+  ST.ticks[key].done=!ST.ticks[key].done;
+  ST.ticks[key].time=ST.ticks[key].done?nowTime():'';
+  renderTick(key);
+  // Show buprenorphine route when ticked
+  if(key==='buprenorphine'){document.getElementById('buprenorphine-route-row').classList.toggle('hidden',!ST.ticks[key].done);}
+  // Show alfaxalone top-up mL input when ticked
+  if(key==='alfax-intra'){document.getElementById('alfax-intra-ml-row').classList.toggle('hidden',!ST.ticks[key].done);}
+  // Show preop extras when microchip/vacc/ivc/alfax-pre ticked
+  renderPreopExtras();
+  autoSave();
+}
+
+function renderTick(key){
+  var el=document.getElementById('tick-'+key);
+  if(!el)return;
+  var t=ST.ticks[key]||{done:false,time:''};
+  el.classList.toggle('done',t.done);
+  var timeEl=document.getElementById('tick-'+key+'-time');
+  if(timeEl){timeEl.textContent=t.time?'🕐 '+t.time:'';timeEl.classList.toggle('hidden',!t.time);}
+}
+
+function renderPreopExtras(){
+  var html='';
+  var microDone=ST.ticks['microchip']&&ST.ticks['microchip'].done;
+  var vaccDone=ST.ticks['vacc']&&ST.ticks['vacc'].done;
+  var ivcDone=ST.ticks['ivc']&&ST.ticks['ivc'].done;
+  var alfaxPreDone=ST.ticks['alfax-pre']&&ST.ticks['alfax-pre'].done;
+  if(microDone)html+='<div class="fld"><label>Microchip number</label><input type="text" id="microchip-num" value="'+(window._microchipNum||'')+'" placeholder="15-digit number" oninput="window._microchipNum=this.value"></div>';
+  if(vaccDone)html+='<div class="fld"><label>Vaccination type</label><input type="text" id="vacc-type" value="'+(window._vaccType||'')+'" placeholder="e.g. F3" oninput="window._vaccType=this.value"></div>';
+  if(ivcDone)html+='<div class="fld"><label>IV catheter gauge</label><select id="ivc-gauge" onchange="window._ivcGauge=this.value"><option value="22G">22G (blue)</option><option value="24G">24G (yellow)</option></select></div>';
+  if(alfaxPreDone)html+='<div class="fld"><label>Alfaxalone pre-op given (mL)</label><input type="number" step="0.01" inputmode="decimal" id="alfax-pre-ml" value="'+(window._alfaxPreMl||'')+'" placeholder="mL actually given" oninput="window._alfaxPreMl=this.value"></div>';
+  document.getElementById('preop-extras').innerHTML=html;
+  if(ivcDone&&window._ivcGauge){var g=document.getElementById('ivc-gauge');if(g)g.value=window._ivcGauge;}
+}
+
+// ── VITALS TABLE ───────────────────────────────────────────────────────
+function addVitalsRow(){
+  var row={id:Date.now(),time:nowTime(),hr:'',rr:'',spo2:'',bp:'',depth:'surgical'};
+  ST.vitals.push(row);
+  renderVitals();
+}
+
+function removeVitalsRow(id){
+  ST.vitals=ST.vitals.filter(function(r){return r.id!==id;});
+  renderVitals();
+}
+
+function renderVitals(){
+  var tbody=document.getElementById('vitals-body');
+  document.getElementById('vitals-empty').style.display=ST.vitals.length?'none':'block';
+  tbody.innerHTML=ST.vitals.map(function(r){
+    return '<tr data-id="'+r.id+'">'
+      +'<td><input type="text" value="'+r.time+'" style="width:68px" onchange="updVital('+r.id+',\'time\',this.value)"></td>'
+      +'<td><input type="number" value="'+r.hr+'" style="width:52px" placeholder="—" onchange="updVital('+r.id+',\'hr\',this.value)"></td>'
+      +'<td><input type="number" value="'+r.rr+'" style="width:44px" placeholder="—" onchange="updVital('+r.id+',\'rr\',this.value)"></td>'
+      +'<td><div style="display:flex;gap:3px;"><input type="text" value="'+r.spo2+'" style="width:52px" onchange="updVital('+r.id+',\'spo2\',this.value)"><button class="btn btn-sm btn-good" style="padding:4px 7px;font-size:11px;font-weight:700;" onclick="updVital('+r.id+',\'spo2\',\'≥98%\');renderVitals()">≥98</button></div></td>'
+      +'<td><input type="text" value="'+r.bp+'" style="width:100px" placeholder="sys/dia MAP" onchange="updVital('+r.id+',\'bp\',this.value)"></td>'
+      +'<td><select style="width:110px;" onchange="updVital('+r.id+',\'depth\',this.value)"><option value="light"'+(r.depth==='light'?' selected':'')+'>Light</option><option value="surgical"'+(r.depth==='surgical'?' selected':'')+'>Surgical plane</option><option value="deep"'+(r.depth==='deep'?' selected':'')+'>Deep</option></select></td>'
+      +'<td><button onclick="removeVitalsRow('+r.id+')" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:2px 5px;">×</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+function updVital(id,key,val){
+  ST.vitals=ST.vitals.map(function(r){return r.id===id?Object.assign({},r,JSON.parse('{\"'+key+'\":\"'+val.replace(/"/g,'\\"')+'\"}'))  :r;});
+}
+
+// ── ENCRYPTION ─────────────────────────────────────────────────────────
+async function encData(data,pw){
+  var enc=new TextEncoder();
+  var km=await crypto.subtle.importKey('raw',enc.encode(pw),{name:'PBKDF2'},false,['deriveKey']);
+  var salt=crypto.getRandomValues(new Uint8Array(16));
+  var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt']);
+  var iv=crypto.getRandomValues(new Uint8Array(12));
+  var ct=await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,enc.encode(JSON.stringify(data)));
+  var out=new Uint8Array(16+12+ct.byteLength);
+  out.set(salt,0);out.set(iv,16);out.set(new Uint8Array(ct),28);
+  return btoa(String.fromCharCode.apply(null,out));
+}
+async function decData(b64,pw){
+  try{
+    var enc=new TextEncoder();
+    var buf=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
+    var salt=buf.slice(0,16),iv=buf.slice(16,28),ct=buf.slice(28);
+    var km=await crypto.subtle.importKey('raw',enc.encode(pw),{name:'PBKDF2'},false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,ct);
+    return JSON.parse(new TextDecoder().decode(pt));
+  }catch(e){return null;}
+}
+
+// ── SAVE / LOAD ─────────────────────────────────────────────────────────
+function collectFormData(){
+  return {
+    id:ST.patientId,date:ST.date,
+    first:val('p-first'),last:val('p-last'),weight:val('p-weight'),sex:val('p-sex'),
+    age:val('p-age'),asa:val('p-asa'),bcsCat:val('p-bcs-cat'),bcs:val('p-bcs'),
+    vet:val('p-vet'),vetOther:val('p-vet-other'),nurse:val('p-nurse'),
+    hr:val('p-hr'),rr:val('p-rr'),mm:val('p-mm'),crt:val('p-crt'),
+    caMurmur:chk('ca-murmur'),caMurmurGrade:val('ca-murmur-grade'),caGallop:chk('ca-gallop'),caArrhythmia:chk('ca-arrhythmia'),
+    pal2T:chk('pal-2t'),palCrypto:chk('pal-crypto'),palPreg:chk('pal-preg'),palPregStage:val('pal-preg-stage'),
+    hcFuri:chk('hc-furi'),hcDental:chk('hc-dental'),hcSkin:chk('hc-skin'),hcFad:chk('hc-fad'),hcEar:chk('hc-ear'),hcNotes:val('hc-notes'),
+    surgType:val('surg-type'),surgStart:val('surg-start'),surgEnd:val('surg-end'),surgNotes:val('surg-notes'),
+    cryptoSide:val('crypto-side'),cryptoLocLeft:val('crypto-loc-left'),cryptoLocRight:val('crypto-loc-right'),cryptoContra:chk('crypto-contra'),
+    scLayer:chk('sc-layer'),
+    isoNotes:val('iso-notes'),
+    buprenorphineRoute:val('buprenorphine-route'),
+    tempPost:val('p-temp-post'),mmPost:val('p-mm-post'),crtPost:val('p-crt-post'),
+    meloxOral:chk('melox-oral-chk'),meloxTiming:val('melox-timing'),
+    recoveryNotes:val('recovery-notes'),
+    ticks:JSON.parse(JSON.stringify(ST.ticks)),
+    vitals:JSON.parse(JSON.stringify(ST.vitals)),
+    emergency:JSON.parse(JSON.stringify(ST.emergency||[])),
+    emgConc:JSON.parse(JSON.stringify(ST.emgConc||{})),
+    microchipNum:window._microchipNum||'',vaccType:window._vaccType||'',ivcGauge:window._ivcGauge||'22G',
+    alfaxPreMl:window._alfaxPreMl||'',alfaxIntraMl:window._alfaxIntraMl||'',
+  };
+}
+
+function populateForm(d){
+  set('p-first',d.first||'');set('p-last',d.last||'');set('p-weight',d.weight||'');set('p-sex',d.sex||'');
+  set('p-age',d.age||'');set('p-asa',d.asa||'1');set('p-bcs-cat',d.bcsCat||'normal');set('p-bcs',d.bcs||'');
+  set('p-vet',d.vet||'JX');set('p-vet-other',d.vetOther||'');set('p-nurse',d.nurse||'');
+  if(d.vet==='Other')show('p-vet-other-row');else hide('p-vet-other-row');
+  set('p-hr',d.hr||'');set('p-rr',d.rr||'Normal bronchovesicular sounds');set('p-mm',d.mm||'Pink');set('p-crt',d.crt||'<2s');
+  setChk('ca-murmur',d.caMurmur||false);set('ca-murmur-grade',d.caMurmurGrade||'1');setChk('ca-gallop',d.caGallop||false);setChk('ca-arrhythmia',d.caArrhythmia||false);
+  onMurmurChange();
+  setChk('pal-2t',d.pal2T||false);setChk('pal-crypto',d.palCrypto||false);setChk('pal-preg',d.palPreg||false);
+  set('pal-preg-stage',d.palPregStage||'1');
+  if(d.palPreg)show('preg-stage-row');else hide('preg-stage-row');
+  onSexChange();
+  setChk('hc-furi',d.hcFuri||false);setChk('hc-dental',d.hcDental||false);setChk('hc-skin',d.hcSkin||false);setChk('hc-fad',d.hcFad||false);setChk('hc-ear',d.hcEar||false);set('hc-notes',d.hcNotes||'');
+  onFuriChange();
+  set('surg-type',d.surgType||'spey');set('surg-start',d.surgStart||'');set('surg-end',d.surgEnd||'');set('surg-notes',d.surgNotes||'');
+  set('crypto-side',d.cryptoSide||'left');set('crypto-loc-left',d.cryptoLocLeft||'inguinal');set('crypto-loc-right',d.cryptoLocRight||'inguinal');setChk('crypto-contra',d.cryptoContra!==false);
+  setChk('sc-layer',d.scLayer||false);
+  set('iso-notes',d.isoNotes||'');set('buprenorphine-route',d.buprenorphineRoute||'SC');
+  set('p-temp-post',d.tempPost||'');set('p-mm-post',d.mmPost||'Pink');set('p-crt-post',d.crtPost||'<2s');
+  setChk('melox-oral-chk',d.meloxOral||false);set('melox-timing',d.meloxTiming||'AM');
+  if(d.meloxOral)show('melox-oral-opts');else hide('melox-oral-opts');
+  set('recovery-notes',d.recoveryNotes||'');
+  window._microchipNum=d.microchipNum||'';window._vaccType=d.vaccType||'';window._ivcGauge=d.ivcGauge||'22G';
+  window._alfaxPreMl=d.alfaxPreMl||'';window._alfaxIntraMl=d.alfaxIntraMl||'';
+  ST.ticks=d.ticks||{};ST.vitals=d.vitals||[];
+  ST.emergency=d.emergency||[];ST.emgConc=d.emgConc||{};ST.emgScenario=null;
+  // Render ticks
+  ['zmd','microchip','vacc','bladder','ivc','intubation','metoclopramide','alfax-pre','bupi-ip','alfax-intra','tattoo','atipamezole','melox-sc','buprenorphine'].forEach(renderTick);
+  renderVitals();renderPreopExtras();
+  if(ST.ticks['buprenorphine']&&ST.ticks['buprenorphine'].done)show('buprenorphine-route-row');
+  if(ST.ticks['alfax-intra']&&ST.ticks['alfax-intra'].done){show('alfax-intra-ml-row');set('alfax-intra-ml',window._alfaxIntraMl||'');}
+  onProcChange();onCryptoChange();
+  updateDoses();updateStickyHeader();updateOralMelox();
+}
+
+function lsKey(first,last,date){return 'hqhvsn_'+first.toLowerCase()+'_'+last.toLowerCase()+'_'+(date||nowDate()).replace(/\//g,'-');}
+
+async function savePatient(){
+  var d=collectFormData();
+  try{
+    var enc=await encData(d,ST.password);
+    var k=lsKey(d.first,d.last,ST.date);
+    localStorage.setItem(k,JSON.stringify({enc:enc,name:(d.first+' '+d.last).trim(),date:ST.date,saved:Date.now()}));
+    cloudSave(d,enc);
+    flash('Saved ✓');
+  }catch(e){flash('Save error: '+e.message,'danger');}
+}
+
+var _autoTimer=null;
+function autoSave(){clearTimeout(_autoTimer);_autoTimer=setTimeout(savePatient,3000);}
+
+// ── SEARCH SCREEN ACTIONS ──────────────────────────────────────────────
+function switchTab(t,btn){
+  ['new','load','import'].forEach(function(id){document.getElementById('tab-'+id).classList.add('hidden');});
+  document.getElementById('tab-'+t).classList.remove('hidden');
+  document.querySelectorAll('.tab-bar button').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  if(t==='load'){renderTodayList();cloudListToday();}
+}
+
+function renderTodayList(){
+  var today=nowDate().replace(/\//g,'-');
+  var items=[],k;
+  for(var i=0;i<localStorage.length;i++){
+    k=localStorage.key(i);
+    if(k&&k.startsWith('hqhvsn_')&&k.endsWith(today)){
+      try{var v=JSON.parse(localStorage.getItem(k));if(v.name)items.push(v);}catch(e){}
+    }
+  }
+  var el=document.getElementById('today-list');
+  if(!items.length){el.innerHTML='<p style="font-size:13px;color:var(--ink3);margin-bottom:12px;">No patients saved today on this device.</p>';return;}
+  el.innerHTML='<div class="lbl" style="margin-bottom:8px;">Today\'s patients</div>'+items.map(function(p){
+    var n=p.name.split(' ');
+    return '<div class="pt-item" onclick="document.getElementById(\'l-first\').value=\''+n[0]+'\';document.getElementById(\'l-last\').value=\''+(n.slice(1).join(' '))+'\'">'
+      +p.name+' <span>· saved '+(new Date(p.saved).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}))+'</span></div>';
+  }).join('');
+}
+
+async function createPatient(){
+  var first=(document.getElementById('s-first').value||'').trim();
+  var last=(document.getElementById('s-last').value||'').trim();
+  var pw=document.getElementById('s-pw').value;
+  if(!first){flash('Enter a first name','danger');return;}
+  if(!pw){flash('Enter the team password','danger');return;}
+  ST.patientId='p_'+Date.now();ST.password=pw;ST.date=nowDate();
+  window._microchipNum='';window._vaccType='';window._ivcGauge='22G';window._alfaxPreMl='';window._alfaxIntraMl='';
+  ST.ticks={};ST.vitals=[];ST.emergency=[];ST.emgConc={};ST.emgScenario=null;ST.emgWeight='';
+  set('p-first',first);set('p-last',last);
+  onProcChange();onSexChange();onMurmurChange();onFuriChange();updateDoses();updateStickyHeader();
+  goPatient();
+  flash('New patient created');
+}
+
+async function loadPatient(){
+  var first=(document.getElementById('l-first').value||'').trim();
+  var last=(document.getElementById('l-last').value||'').trim();
+  var pw=document.getElementById('l-pw').value;
+  if(!first){flash('Enter the name / shelter number','danger');return;}
+  if(!pw){flash('Enter the team password','danger');return;}
+  var k=lsKey(first,last,nowDate());
+  var raw=localStorage.getItem(k);
+  if(raw){
+    try{
+      var stored=JSON.parse(raw);
+      var d=await decData(stored.enc,pw);
+      if(!d){flash('Wrong password','danger');return;}
+      ST.patientId=d.id;ST.password=pw;ST.date=stored.date||nowDate();
+      populateForm(d);goPatient();
+      flash('Loaded — '+first+(last?' '+last:''));
+    }catch(e){flash('Load error: '+e.message,'danger');}
+    return;
+  }
+  // Not on this device — try the cloud
+  if(CLOUD.on){
+    ST.password=pw;
+    var cd=await cloudGetDoc(cloudDocId(first,last,nowDate()),pw);
+    if(cd){
+      ST.patientId=cd.id||('p_'+Date.now());ST.date=cd.__date||nowDate();
+      populateForm(cd);goPatient();
+      flash('Loaded from cloud — '+first+(last?' '+last:''));
+      return;
+    }
+  }
+  flash('No record found for '+first+(last?' '+last:'')+' today. It may be on another device — check the cloud list, or use Import from Teams.','danger');
+}
+
+async function importPatient(){
+  var text=(document.getElementById('i-text').value||'').trim();
+  var pw=document.getElementById('i-pw').value;
+  if(!text){flash('Paste the exported record text first','danger');return;}
+  if(!pw){flash('Enter the team password','danger');return;}
+  try{
+    var d=await decData(text,pw);
+    if(!d){flash('Wrong password or invalid record text','danger');return;}
+    ST.patientId=d.id||('p_'+Date.now());ST.password=pw;ST.date=d.date||nowDate();
+    var k=lsKey(d.first||'',d.last||'',ST.date);
+    localStorage.setItem(k,JSON.stringify({enc:text,name:((d.first||'')+' '+(d.last||'')).trim(),date:ST.date,saved:Date.now()}));
+    populateForm(d);goPatient();
+    flash('Imported — '+d.first+' '+d.last);
+  }catch(e){flash('Import error: '+e.message,'danger');}
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────
+function goSearch(){cloudUnsubscribe();document.getElementById('patient-screen').classList.add('hidden');document.getElementById('search-screen').classList.remove('hidden');document.getElementById('sticky-hdr').style.display='none';document.getElementById('emg-fab').style.display='none';}
+function goPatient(){document.getElementById('search-screen').classList.add('hidden');document.getElementById('patient-screen').classList.remove('hidden');document.getElementById('sticky-hdr').style.display='block';document.getElementById('emg-fab').style.display='inline-flex';cloudSubscribe();}
+
+// ── EXPORT ─────────────────────────────────────────────────────────────
+function buildExportNote(){
+  var d=collectFormData();
+  var doses=calcDoses(d.weight);
+  var tk=function(k){return d.ticks[k]||{done:false,time:''};};
+  var tf=function(label,key,extra){var t=tk(key);return t.done?label+': '+t.time+(extra?' — '+extra:''):label+': not recorded';};
+  var sep='─'.repeat(40);
+  var lines=[];
+  lines.push('HQHVSN SURGICAL RECORD');
+  lines.push(sep);
+  var vet=d.vet==='Other'?d.vetOther:d.vet;
+  lines.push('Patient: '+(d.first||'?')+' '+(d.last||''));
+  lines.push('Date: '+d.date+'  |  Vet: '+(vet||'?')+'  |  Nurse: '+(d.nurse||'?'));
+  lines.push('Weight: '+(d.weight||'?')+'kg  |  Sex: '+(d.sex||'?')+'  |  Age: '+(d.age||'?')+' months  |  ASA: '+d.asa+'  |  BCS: '+(d.bcs||'?')+'/9 ('+(d.bcsCat||'')+')');
+  lines.push('');
+  lines.push('PRE-OPERATIVE EXAMINATION');lines.push(sep);
+  if(d.hr)lines.push('HR: '+d.hr+' bpm');
+  lines.push('Respiratory: '+d.rr);
+  lines.push('MM colour: '+d.mm+'  |  CRT: '+d.crt);
+  var card=[d.caMurmur?'Heart murmur (Grade '+(d.caMurmurGrade||'?')+'/6)':'',d.caGallop?'Gallop rhythm':'',d.caArrhythmia?'Arrhythmia':''].filter(Boolean);
+  lines.push('Cardiac auscultation: '+(card.length?card.join(', '):'No abnormalities auscultated'));
+  var pals=[d.pal2T?'2 testes palpated':'',d.palCrypto?'Cryptorchid':'',d.palPreg?'Pregnant (Stage '+d.palPregStage+')':''].filter(Boolean);
+  if(pals.length)lines.push('Palpation: '+pals.join(', '));
+  var hcs=[d.hcFuri?'FURI signs':'',d.hcDental?'Dental disease':'',d.hcSkin?'Skin disease':'',d.hcFad?'FAD':'',d.hcEar?'Ear infection':''].filter(Boolean);
+  lines.push('Health check: '+(hcs.length?hcs.join(', '):'No abnormalities identified'));
+  if(d.hcNotes)lines.push('Additional findings: '+d.hcNotes);
+  lines.push('');
+  if(doses){
+    lines.push('DRUG DOSES ('+d.weight+'kg)');lines.push(sep);
+    lines.push('ZMD: '+doses.zml+'mL IM  |  Metoclopramide: '+doses.meto+'mL SC  |  Atipamezole: '+doses.atip+'mL IM');
+    if(d.surgType!=='castrate')lines.push('Bupivacaine IP: '+doses.bupi+'mL  |  Meloxicam SC: '+doses.meloxSC+'mL SC');
+    lines.push('');
+  }
+  lines.push('PRE-OP TIMELINE');lines.push(sep);
+  lines.push(tf('ZMD IM','zmd'));
+  lines.push(tf('Metoclopramide SC','metoclopramide',doses?doses.meto+'mL':''));
+  if(tk('alfax-pre').done)lines.push('Alfaxalone pre-op: '+(tk('alfax-pre').time||'')+(d.alfaxPreMl?' — '+d.alfaxPreMl+'mL given':''));
+  lines.push(tf('Microchip','microchip',d.microchipNum));
+  lines.push(tf('Vaccination','vacc',d.vaccType));
+  lines.push(tf('Bladder expressed','bladder'));
+  lines.push('IV catheter: '+(tk('ivc').done?'YES — '+(d.ivcGauge||'')+(tk('ivc').time?' at '+tk('ivc').time:''):'not placed'));
+  lines.push('Intubation: '+(tk('intubation').done?'YES'+(tk('intubation').time?' at '+tk('intubation').time:''):'not intubated'));
+  lines.push('');
+  var procLabels={castrate:'Routine Castration',cryptorchid:'Cryptorchid Castration',spey:'Routine Spey (OVH)',preg1:'Pregnant Spey — Stage 1',preg2:'Pregnant Spey — Stage 2',preg3:'Pregnant Spey — Stage 3',pyometra:'Pyometra OVH'};
+  lines.push('SURGICAL PROCEDURE: '+(procLabels[d.surgType]||d.surgType));
+  if(d.surgStart||d.surgEnd)lines.push('Surgery time: '+(d.surgStart||'?')+' — '+(d.surgEnd||'?'));
+  lines.push(sep);
+  lines.push(d.surgNotes||'(no surgical notes)');
+  if(tk('bupi-ip').done&&doses)lines.push('\nBupivacaine '+doses.bupi+'mL (2mg/kg) intraperitoneal splash administered at '+(tk('bupi-ip').time||'')+' .');
+  if(tk('alfax-intra').done)lines.push('Alfaxalone intraop top-up at '+(tk('alfax-intra').time||'')+(d.alfaxIntraMl?' — '+d.alfaxIntraMl+'mL given':'')+' .');
+  if(d.isoNotes)lines.push('Anaesthetic adjustments: '+d.isoNotes);
+  lines.push('');
+  lines.push('INTRAOPERATIVE MONITORING');lines.push(sep);
+  if(!d.vitals||!d.vitals.length){lines.push('(no readings recorded)');}
+  else{
+    lines.push('Time    HR   RR   SpO\u2082      BP               Depth');
+    d.vitals.forEach(function(r){lines.push((r.time||'').padEnd(7)+' '+(r.hr||'-').toString().padEnd(4)+' '+(r.rr||'-').toString().padEnd(4)+' '+(r.spo2||'-').toString().padEnd(9)+' '+(r.bp||'-').toString().padEnd(16)+' '+(r.depth||'-'));});
+  }
+  lines.push('');
+  lines.push('POST-OPERATIVE');lines.push(sep);
+  lines.push(tf('Tattoo (left ear)','tattoo'));
+  lines.push(tf('Atipamezole IM','atipamezole',doses?doses.atip+'mL (5mg/mL)':''));
+  lines.push('Temp post-op: '+(d.tempPost||'not recorded')+'°C  |  MM: '+(d.mmPost||'—')+'  |  CRT: '+(d.crtPost||'—'));
+  if(tk('buprenorphine').done&&doses)lines.push('Buprenorphine: '+doses.bupren+'mL '+(d.buprenorphineRoute||'SC')+' at '+(tk('buprenorphine').time||''));
+  if(tk('melox-sc').done&&doses)lines.push('Meloxicam: '+doses.meloxSC+'mL SC at '+(tk('melox-sc').time||''));
+  if(d.meloxOral&&doses){
+    lines.push('');lines.push('SEND-HOME MEDICATION');
+    lines.push('MELOXICAM oral suspension 0.5mg/mL');
+    lines.push('Give '+doses.meloxOral+'mL orally in the '+(d.meloxTiming||'AM')+' ONCE daily WITH FOOD for 4 days.');
+    lines.push('Start: '+tomorrowDate()+', '+(d.meloxTiming||'AM'));
+    lines.push('STOP if signs of vomiting, diarrhoea and/or not eating.');
+  }
+  if(d.recoveryNotes){lines.push('');lines.push('Recovery notes: '+d.recoveryNotes);}
+  if(d.emergency&&d.emergency.length){
+    lines.push('');lines.push('⚠ EMERGENCY EVENT');lines.push(sep);
+    d.emergency.forEach(function(e){lines.push(e.time+'  '+e.text);});
+  }
+  return lines.join('\n');
+}
+
+function refreshExport(){
+  var note=buildExportNote();
+  ST.exportText=note;
+  document.getElementById('export-box').textContent=note;
+}
+
+function copyExport(){
+  refreshExport();
+  navigator.clipboard.writeText(ST.exportText).then(function(){flash('Copied — paste into ezyVet');}).catch(function(){flash('Copy failed — select the text manually','danger');});
+}
+
+function shareToTeams(){
+  refreshExport();
+  navigator.clipboard.writeText(ST.exportText).then(function(){flash('Note copied — opening Teams');window.location.href='msteams://';}).catch(function(){window.location.href='msteams://';});
+}
+
+async function exportRecord(){
+  var d=collectFormData();
+  try{
+    var enc=await encData(d,ST.password);
+    await navigator.clipboard.writeText(enc);
+    flash('Record exported — paste into Teams. Other nurse taps "Import from Teams" to load it.');
+  }catch(e){flash('Export error: '+e.message,'danger');}
+}
+
+// Open export section and refresh on click
+document.querySelector('#sec-export .sec-hdr').addEventListener('click',function(){setTimeout(refreshExport,50);});
+
+// ── EMERGENCY TOOL ─────────────────────────────────────────────────────
+// Doses reproduced from surgery_anesthesia_hub.html (RECOVER 2024 / AAHA).
+// All per-kg figures; concentration entered per-drug to get mL (AU/US vials differ).
+var EMG_SCN=[
+  {id:'arrest',btn:'🔴 Cardiac arrest',title:'🔴 Cardiac Arrest → CPR (RECOVER 2024)',sections:[
+    {heading:'STEP 1 · Start NOW — all at once (BLS)',note:'Confirm arrest in &lt;10 s, then start. Turn the vaporiser OFF.',actions:[
+      'Chest compressions 100–120/min, ⅓–½ chest width — do NOT delay · rotate compressor every 2 min',
+      'Secure airway: intubate · ventilate 10 breaths/min with 100% O₂',
+      'Place IV / IO access',
+      'Attach ECG + capnography (EtCO₂) · assign team leader & roles'
+    ]},
+    {heading:'STEP 2 · First drug — give as soon as access is in (ALS)',note:'Adrenaline first, low-dose, as early as possible — then repeat every other 2-min cycle (every 3–5 min). Check rhythm only at the cycle change to minimise pauses.',drugs:[
+      {k:'arr_adr',n:'① Adrenaline (Epinephrine) — LOW dose',unit:'mg',low:0.01,route:'IV/IO',note:'FIRST drug · every 3–5 min (every other cycle) · ET route 0.1 mg/kg · escalate to high-dose 0.1 mg/kg only after prolonged CPR'},
+      {k:'arr_vaso',n:'Vasopressin (optional)',unit:'U',low:0.8,route:'IV/IO',note:'may replace or alternate with adrenaline'}
+    ]},
+    {heading:'STEP 3 · Match the rhythm',note:'ASYSTOLE / PEA (non-shockable) → atropine + continue adrenaline.\nVF / pulseless VT (shockable) → DEFIBRILLATE first, then resume CPR.',actions:[
+      'VF / pulseless VT → defibrillate biphasic 2–4 J/kg (monophasic 4–6), start low → immediately resume compressions for 2 min before re-checking'
+    ],drugs:[
+      {k:'arr_atr',n:'Atropine',unit:'mg',low:0.05,route:'IV/IO',note:'asystole / PEA / vagally-mediated arrest · once per 3–5 min cycle'},
+      {k:'arr_amio',n:'Amiodarone',unit:'mg',low:5,route:'IV/IO',note:'refractory VF / pulseless VT after repeated shocks. ⚠ canine lidocaine 2 mg/kg is NOT recommended in cats'}
+    ]},
+    {heading:'STEP 4 · Reverse drugs & fix causes',drugs:[
+      {k:'arr_nal',n:'Naloxone',unit:'mg',low:0.04,route:'IV',note:'if opioid (methadone) on board'},
+      {k:'arr_ati',n:'Atipamezole',unit:'mg',low:0.1,route:'IM/IV',note:'reverse medetomidine (100 µg/kg)'}
+    ],extra:'Flumazenil if benzodiazepine-induced. Address reversible causes: hypoxia, hypovolaemia, K⁺/metabolic, hypothermia, tamponade, tension pneumothorax, toxins, thromboembolism.'}
+  ]},
+  {id:'apnoea',btn:'🟠 Apnoea',title:'🟠 Apnoea / Hypoventilation',sections:[
+    {note:'Defined as ETCO₂ > 55 mmHg, RR < 8, or apnoea > 30 seconds.',actions:[
+      'Check ET tube placement & patency',
+      'Turn inhalant DOWN / OFF',
+      'Manual IPPV 10–15 mL/kg, 8–12 breaths/min — 100% O₂',
+      'Secure IV catheter'
+    ],drugs:[
+      {k:'apn_nal',n:'Naloxone',unit:'mg',low:0.04,route:'IV',note:'opioid reversal — repeat as needed (short half-life)'},
+      {k:'apn_ati',n:'Atipamezole',unit:'mg',low:0.1,route:'IM',note:'alpha-2 reversal (100 µg/kg)'}
+    ],extra:'⚠ Doxapram is NOT recommended (exam trap). Flumazenil for benzodiazepine reversal if used.'}
+  ]},
+  {id:'brady',btn:'🟡 Bradycardia',title:'🟡 Bradycardia (cat HR < 90)',sections:[
+    {heading:'Assess blood pressure FIRST',note:'HR low + BP NORMAL → no reversal needed. Reduce inhalant, treat the cause, monitor.\nHR low + BP LOW → first attempt is ALWAYS reversal (reverse the medetomidine in the ZMD premed).',actions:[
+      'Log bradycardia — cat HR < 90'
+    ]},
+    {heading:'Reversal — first line if HR low + BP low',drugs:[
+      {k:'bra_ati',n:'Atipamezole',unit:'mg',low:0.1,route:'IM/IV',note:'reverses medetomidine · 100 µg/kg, or ½ ZMD volume (see Section 2)'}
+    ]},
+    {heading:'Anticholinergic — backup if reversal insufficient',drugs:[
+      {k:'bra_atr',n:'Atropine',unit:'mg',low:0.02,high:0.04,route:'IV',note:'onset 1–2 min · 0.04–0.1 mg/kg IM if no IV access'},
+      {k:'bra_gly',n:'Glycopyrrolate',unit:'mg',low:0.005,high:0.011,route:'IV',note:'longer acting · does not cross blood–brain barrier'}
+    ]}
+  ]},
+  {id:'tachy',btn:'🟡 Tachycardia',title:'🟡 Tachycardia',sections:[
+    {heading:'① Sinus tachycardia — find & treat the cause',actions:[
+      'Light anaesthetic plane → alfaxalone top-up / deepen',
+      'Pain → analgesia',
+      'Hypoxia / hypercapnia → check O₂ & ventilation',
+      'Hypovolaemia / hypotension → fluid bolus',
+      'Hyperthermia · drug effect'
+    ]},
+    {heading:'② VPCs / Ventricular tachycardia',note:'First correct the cause: hypoxia, hypercapnia, electrolytes (esp. K⁺ / Mg²⁺), light plane, pain, catecholamines.\nTreat if: sustained VT, multiform / polymorphic, R-on-T, or haemodynamically unstable.',drugs:[
+      {k:'tac_lid',n:'Lidocaine (cat)',unit:'mg',low:0.25,high:0.5,route:'slow IV',note:'⚠ caution — cats are sensitive to lidocaine toxicity. Do NOT use the canine 2 mg/kg dose.'}
+    ],extra:'Alternative: amiodarone. Magnesium for refractory ventricular arrhythmias.'}
+  ]},
+  {id:'hypotension',btn:'🟠 Hypotension',title:'🟠 Hypotension (MAP < 60 mmHg)',sections:[
+    {actions:[
+      'Step 1 — Reduce inhalant (vasodilation is dose-dependent)',
+      'Step 2 — Isotonic crystalloid bolus (see below), reassess after each',
+      'Step 3 — Vasopressor / inotrope if no response',
+      'If also bradycardic → give an anticholinergic'
+    ],drugs:[
+      {k:'hyp_flu',n:'Crystalloid bolus',unit:'mL',low:5,high:10,route:'IV',note:'isotonic · 5–10 mL/kg · reassess after each bolus',noconc:true},
+      {k:'hyp_eph',n:'Ephedrine (bolus)',unit:'mg',low:0.1,high:0.2,route:'IV bolus',note:'indirect — inotrope + vasoconstrictor. Tachyphylaxis with repeat dosing. NOT the same as noradrenaline.'},
+      {k:'hyp_dob',n:'Dobutamine (CRI)',cri:true,dtext:'2–10 µg/kg/min',route:'CRI',note:'inotrope — poor contractility. Cats: start low (1–5 µg/kg/min); watch tachycardia/seizures.'},
+      {k:'hyp_na',n:'Noradrenaline / Norepinephrine (CRI)',cri:true,dtext:'0.05–0.3 µg/kg/min',route:'CRI',note:'direct potent vasoconstrictor — for refractory vasodilatory hypotension.'}
+    ],extra:'Match the drug to the problem: dobutamine for contractility · noradrenaline / phenylephrine for vasodilation · ephedrine (bolus) for both. Dopamine is an alternative CRI. Investigate haemorrhage, excessive depth, acepromazine, cardiac disease, sepsis.'}
+  ]},
+  {id:'hypothermia',btn:'🔵 Hypothermia',title:'🔵 Hypothermia',sections:[
+    {actions:[
+      'Active warming — forced-air / warming devices',
+      'Monitor temperature every 5–10 min',
+      'Target core temp > 37°C before recovery',
+      'Reduce inhalant (hypothermia deepens anaesthesia)'
+    ],note:'Hypothermia prolongs drug metabolism, extends recovery, depresses cardiac function, increases bleeding time and impairs immunity. Especially severe in kittens & small cats — preventable.'}
+  ]}
+];
+var EMG_DRUGS={};
+EMG_SCN.forEach(function(s){s.sections.forEach(function(sec){(sec.drugs||[]).forEach(function(d){EMG_DRUGS[d.k]=d;});});});
+
+function emgRnd(n){return Math.round(n*1000)/1000;}
+function emgDoseText(d,w){
+  if(!w||w<=0||isNaN(w))return '— '+d.unit;
+  var lo=emgRnd(d.low*w);
+  if(d.high)return lo+'–'+emgRnd(d.high*w)+' '+d.unit;
+  return lo+' '+d.unit;
+}
+function emgMlText(d,w){
+  if(d.noconc)return '';
+  var c=parseFloat((ST.emgConc||{})[d.k]);
+  if(!w||w<=0||isNaN(w)||!c||c<=0||isNaN(c))return '— mL';
+  var lo=emgRnd(d.low*w/c);
+  if(d.high)return lo+'–'+emgRnd(d.high*w/c)+' mL';
+  return lo+' mL';
+}
+
+function openEmergency(){
+  if(!ST.emergency)ST.emergency=[];
+  if(!ST.emgConc)ST.emgConc={};
+  var w=val('p-weight');
+  ST.emgWeight=ST.emgWeight||w||'';
+  set('emg-weight',ST.emgWeight);
+  renderEmgScenarios();
+  selectScenario(ST.emgScenario||EMG_SCN[0].id);
+  renderEmgLog();
+  document.getElementById('emg-overlay').classList.add('open');
+}
+function closeEmergency(){document.getElementById('emg-overlay').classList.remove('open');}
+function setEmgWeight(v){ST.emgWeight=v;refreshEmgDoses();}
+
+function renderEmgScenarios(){
+  document.getElementById('emg-scn-grid').innerHTML=EMG_SCN.map(function(s){
+    return '<button class="emg-scn'+(ST.emgScenario===s.id?' active':'')+'" onclick="selectScenario(\''+s.id+'\')">'+s.btn+'</button>';
+  }).join('');
+}
+
+function emgDrugCard(d){
+  if(d.cri){
+    return '<div class="emg-drug">'
+      +'<div class="emg-drug-top"><div class="emg-drug-name">'+d.n+'</div>'
+      +'<button class="btn btn-sm" style="background:#8B2A1E;color:#FFF" onclick="logDrug(\''+d.k+'\')">＋ Log started</button></div>'
+      +'<div class="emg-drug-dose">'+d.dtext+(d.route?' '+d.route:'')+'</div>'
+      +(d.note?'<div class="emg-drug-note">'+d.note+'</div>':'')
+      +'</div>';
+  }
+  var rng=d.high?(d.low+'–'+d.high):(''+d.low);
+  var perkg=d.unit==='mL'?'mL/kg':d.unit+'/kg';
+  var conc=d.noconc?'':'<span class="emg-conc">'+d.unit+'/mL <input type="number" step="any" inputmode="decimal" value="'+((ST.emgConc||{})[d.k]||'')+'" placeholder="conc" oninput="setConc(\''+d.k+'\',this.value)"></span><span class="emg-vol">→ <b class="emg-ml" data-k="'+d.k+'">— mL</b></span>';
+  return '<div class="emg-drug">'
+    +'<div class="emg-drug-top"><div class="emg-drug-name">'+d.n+'</div>'
+    +'<button class="btn btn-sm" style="background:#8B2A1E;color:#FFF" onclick="logDrug(\''+d.k+'\')">＋ Log given</button></div>'
+    +'<div class="emg-drug-dose">'+rng+' '+perkg+(d.route?' '+d.route:'')+'</div>'
+    +'<div class="emg-drug-calc"><span>Total <b class="emg-mg" data-k="'+d.k+'">—</b></span>'+conc+'</div>'
+    +(d.note?'<div class="emg-drug-note">'+d.note+'</div>':'')
+    +'</div>';
+}
+
+function selectScenario(id){
+  ST.emgScenario=id;
+  renderEmgScenarios();
+  var s=EMG_SCN.filter(function(x){return x.id===id;})[0];
+  if(!s)return;
+  var h='<div class="emg-panel-title">'+s.title+'</div>';
+  s.sections.forEach(function(sec){
+    h+='<div class="emg-section">';
+    if(sec.heading)h+='<div class="emg-sec-h">'+sec.heading+'</div>';
+    if(sec.note)h+='<div class="emg-note">'+sec.note.replace(/\n/g,'<br>')+'</div>';
+    (sec.actions||[]).forEach(function(a){h+='<button class="emg-action" onclick="logActionEl(this)">＋ '+a+'</button>';});
+    (sec.drugs||[]).forEach(function(d){h+=emgDrugCard(d);});
+    if(sec.extra)h+='<div class="emg-extra">'+sec.extra+'</div>';
+    h+='</div>';
+  });
+  document.getElementById('emg-panel').innerHTML=h;
+  refreshEmgDoses();
+}
+
+function refreshEmgDoses(){
+  var w=parseFloat(ST.emgWeight);
+  document.querySelectorAll('#emg-panel .emg-mg').forEach(function(el){var d=EMG_DRUGS[el.dataset.k];if(d)el.textContent=emgDoseText(d,w);});
+  document.querySelectorAll('#emg-panel .emg-ml').forEach(function(el){var d=EMG_DRUGS[el.dataset.k];if(d)el.textContent=emgMlText(d,w);});
+}
+
+function setConc(k,v){
+  if(!ST.emgConc)ST.emgConc={};
+  ST.emgConc[k]=v;
+  var el=document.querySelector('#emg-panel .emg-ml[data-k="'+k+'"]');
+  if(el)el.textContent=emgMlText(EMG_DRUGS[k],parseFloat(ST.emgWeight));
+}
+
+function logDrug(k){
+  var d=EMG_DRUGS[k];var txt;
+  if(d.cri){
+    txt=d.n+' '+d.dtext+(d.route?' '+d.route:'');
+  }else{
+    var w=parseFloat(ST.emgWeight);
+    txt=d.n+' '+emgDoseText(d,w);
+    var ml=emgMlText(d,w);
+    if(ml&&ml.indexOf('—')<0)txt+=' ('+ml+')';
+    if(d.route)txt+=' '+d.route;
+  }
+  ST.emergency.push({time:nowTime(),text:txt});
+  renderEmgLog();flash('Logged: '+d.n);autoSave();
+}
+function logActionEl(btn){
+  var t=btn.textContent.replace(/^＋\s*/,'');
+  ST.emergency.push({time:nowTime(),text:t});
+  renderEmgLog();flash('Logged');autoSave();
+}
+function renderEmgLog(){
+  var box=document.getElementById('emg-log-list');if(!box)return;
+  if(!ST.emergency||!ST.emergency.length){box.innerHTML='<p style="font-size:12px;color:var(--ink3);font-style:italic;">No emergency events logged yet.</p>';return;}
+  box.innerHTML=ST.emergency.map(function(e,i){
+    return '<div class="emg-log-item"><span><span class="emg-log-time">🕐 '+e.time+'</span> '+e.text+'</span><button onclick="removeEmgLog('+i+')" style="background:none;border:none;color:var(--red);font-size:17px;cursor:pointer;padding:0 4px;">×</button></div>';
+  }).join('');
+}
+function removeEmgLog(i){ST.emergency.splice(i,1);renderEmgLog();autoSave();}
+
+// ── CLOUD SYNC (Firebase) ──────────────────────────────────────────────
+// Paste your Firebase web config below. While apiKey starts with "PASTE",
+// cloud sync stays OFF and the app runs exactly as before (local-only).
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDCmLNAHlunf80W_wvLmASLkrlBioUlYGI",
+  authDomain: "hqhvsn.firebaseapp.com",
+  projectId: "hqhvsn",
+  storageBucket: "hqhvsn.firebasestorage.app",
+  messagingSenderId: "760395854572",
+  appId: "1:760395854572:web:0226544b6ffaf88e49ebc9",
+  measurementId: "G-VSPJ28JWKS"
+};
+var CLOUD={on:false,db:null,unsub:null,docKey:null,lastSentEnc:null,pendingRemoteEnc:null};
+
+function cloudConfigured(){return FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf('PASTE')!==0;}
+function cloudDocId(first,last,date){return ('hqhvsn_'+(first||'').toLowerCase()+'_'+(last||'').toLowerCase()+'_'+(date||nowDate())).replace(/[\/\s.#$\[\]]+/g,'-');}
+
+function cloudStatus(s){
+  var el=document.getElementById('cloud-pill');if(!el)return;
+  var map={synced:['☁︎ synced','#2D6B62'],syncing:['⟳ syncing','#C66A2A'],offline:['⌁ offline · queued','#8B2A1E'],local:['· local only','#8A9490']};
+  var m=map[s]||map.local;el.textContent=m[0];el.style.background=m[1];
+}
+
+function cloudInit(){
+  if(!cloudConfigured()||typeof firebase==='undefined'){cloudStatus('local');return;}
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    CLOUD.db=firebase.firestore();
+    try{CLOUD.db.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e){}
+    cloudStatus('syncing');
+    firebase.auth().signInAnonymously().then(function(){
+      CLOUD.on=true;cloudStatus('synced');cloudPurgeExpired();
+    }).catch(function(){CLOUD.on=false;cloudStatus('local');});
+  }catch(e){CLOUD.on=false;cloudStatus('local');}
+}
+
+async function cloudSave(rec,encBlob){
+  if(!CLOUD.on||!CLOUD.db)return;
+  try{
+    cloudStatus('syncing');
+    var id=cloudDocId(rec.first,rec.last,ST.date);
+    CLOUD.docKey=id;CLOUD.lastSentEnc=encBlob;
+    await CLOUD.db.collection('patients').doc(id).set({
+      enc:encBlob,
+      name:((rec.first||'')+' '+(rec.last||'')).trim(),
+      date:ST.date,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      expireAt:firebase.firestore.Timestamp.fromMillis(Date.now()+24*3600*1000)
+    },{merge:true});
+    cloudStatus('synced');
+  }catch(e){cloudStatus('offline');}
+}
+
+function cloudSubscribe(){
+  if(!CLOUD.on||!CLOUD.db)return;
+  cloudUnsubscribe();
+  var id=cloudDocId(val('p-first'),val('p-last'),ST.date);
+  CLOUD.docKey=id;
+  CLOUD.unsub=CLOUD.db.collection('patients').doc(id).onSnapshot(function(snap){
+    if(!snap.exists)return;
+    var data=snap.data();if(!data||!data.enc)return;
+    if(data.enc===CLOUD.lastSentEnc)return;       // our own write echoing back
+    CLOUD.pendingRemoteEnc=data.enc;
+    var b=document.getElementById('cloud-banner');if(b)b.classList.remove('hidden');
+  },function(){cloudStatus('offline');});
+}
+function cloudUnsubscribe(){if(CLOUD.unsub){try{CLOUD.unsub();}catch(e){}CLOUD.unsub=null;}var b=document.getElementById('cloud-banner');if(b)b.classList.add('hidden');CLOUD.pendingRemoteEnc=null;}
+
+async function loadRemoteUpdate(){
+  if(!CLOUD.pendingRemoteEnc)return;
+  var d=await decData(CLOUD.pendingRemoteEnc,ST.password);
+  if(!d){flash('Could not decrypt the cloud update (password mismatch)','danger');return;}
+  CLOUD.lastSentEnc=CLOUD.pendingRemoteEnc;
+  populateForm(d);
+  document.getElementById('cloud-banner').classList.add('hidden');
+  CLOUD.pendingRemoteEnc=null;
+  flash('Loaded latest from cloud');
+}
+
+async function cloudGetDoc(id,pw){
+  if(!CLOUD.on||!CLOUD.db)return null;
+  try{var doc=await CLOUD.db.collection('patients').doc(id).get();
+    if(!doc.exists)return null;
+    var data=doc.data();var d=await decData(data.enc,pw);
+    if(d){CLOUD.lastSentEnc=data.enc;d.__date=data.date;}
+    return d;
+  }catch(e){return null;}
+}
+
+async function cloudPurgeExpired(){
+  // Auto-clear records past their expireAt (24 h after last save) — TTL fallback.
+  if(!CLOUD.on||!CLOUD.db)return;
+  try{
+    var snap=await CLOUD.db.collection('patients').where('expireAt','<',firebase.firestore.Timestamp.now()).get();
+    snap.forEach(function(doc){doc.ref.delete().catch(function(){});});
+  }catch(e){}
+}
+
+async function cloudListToday(){
+  if(!CLOUD.on||!CLOUD.db)return;
+  try{
+    var snap=await CLOUD.db.collection('patients').where('date','==',nowDate()).get();
+    var items=[];snap.forEach(function(doc){var v=doc.data();if(v.name)items.push(v);});
+    if(!items.length)return;
+    var el=document.getElementById('today-list');
+    el.innerHTML+='<div class="lbl" style="margin:10px 0 8px;">☁︎ Cloud patients today</div>'+items.map(function(p){
+      var n=p.name.split(' ');
+      return '<div class="pt-item" onclick="document.getElementById(\'l-first\').value=\''+n[0]+'\';document.getElementById(\'l-last\').value=\''+(n.slice(1).join(' '))+'\'">'+p.name+' <span>· cloud</span></div>';
+    }).join('');
+  }catch(e){}
+}
+
+// Init
+(function(){onProcChange();onSexChange();onMurmurChange();onFuriChange();updateDoses();cloudInit();})();
+</script>
+</body>
+</html>
