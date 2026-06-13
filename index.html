@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>HQHVSN — Feline</title>
+<meta name="theme-color" content="#1F4842">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HQHVSN">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{--bg:#F5F2EA;--card:#FFF;--ink:#1C2421;--ink2:#4A5550;--ink3:#8A9490;--line:#DDD8CA;--green:#1F4842;--amber:#C66A2A;--red:#8B2A1E;--teal:#2D6B62;--soft:#EDE8D6;--good:#3F7D5C;font-size:15px;}
@@ -139,6 +146,36 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0;}
 </style>
 </head>
 <body>
+
+<!-- PASSCODE GATE -->
+<div id="app-gate" style="position:fixed;inset:0;z-index:99999;background:#1F4842;display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <div style="background:#fff;border-radius:14px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3);">
+    <div style="font-size:22px;font-weight:800;color:#1F4842;">HQHVSN</div>
+    <div style="font-size:13px;color:#4A5550;margin:4px 0 18px;">Enter passcode to continue</div>
+    <input id="gate-input" type="password" autocomplete="off" autocapitalize="off" placeholder="Passcode" style="width:100%;padding:11px;border:1px solid #DDD8CA;border-radius:8px;font-size:16px;text-align:center;margin-bottom:10px;box-sizing:border-box;">
+    <button id="gate-btn" style="width:100%;padding:11px;border:none;border-radius:8px;background:#1F4842;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Unlock</button>
+    <div id="gate-err" style="color:#8B2A1E;font-size:12px;margin-top:8px;height:14px;"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var HASH='c87f1923534ed3994cc12573be7937aeaaa6118dda021c7c3c9045ddb186e7ac';
+  var KEY='hqhvsn_gate_v1';
+  var gate=document.getElementById('app-gate');
+  if(localStorage.getItem(KEY)===HASH){gate.parentNode.removeChild(gate);return;}
+  document.body.style.overflow='hidden';
+  async function sha(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+  async function submit(){
+    var v=(document.getElementById('gate-input').value||'').trim();
+    if(await sha(v)===HASH){localStorage.setItem(KEY,HASH);document.body.style.overflow='';gate.parentNode.removeChild(gate);}
+    else{document.getElementById('gate-err').textContent='Incorrect passcode';document.getElementById('gate-input').select();}
+  }
+  document.getElementById('gate-btn').addEventListener('click',submit);
+  document.getElementById('gate-input').addEventListener('keydown',function(e){if(e.key==='Enter')submit();});
+  try{document.getElementById('gate-input').focus();}catch(e){}
+})();
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){});});}</script>
 
 <!-- TOAST -->
 <div id="toast"></div>
