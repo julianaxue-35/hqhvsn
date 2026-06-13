@@ -169,42 +169,17 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0;}
 <div id="search-screen">
   <div class="ss-title">
     <h1>HQHVSN Workflow</h1>
-    <p>Feline Protocol · RSPCA Victoria</p>
+    <p>Feline Protocol</p>
   </div>
   <div class="card">
-    <div class="tab-bar">
-      <button class="active" onclick="switchTab('new',this)">New patient</button>
-      <button onclick="switchTab('load',this)">This device</button>
-      <button onclick="switchTab('import',this)">Import from Teams</button>
+    <div class="row2">
+      <div class="fld"><label>First name / shelter no.</label><input id="s-first" type="text" placeholder="e.g. Mochi or SC12345"></div>
+      <div class="fld"><label>Last name (optional)</label><input id="s-last" type="text" placeholder="e.g. Lee"></div>
     </div>
-
-    <div id="tab-new">
-      <div class="row2">
-        <div class="fld"><label>First name / shelter no.</label><input id="s-first" type="text" placeholder="e.g. Mochi or SC12345"></div>
-        <div class="fld"><label>Last name</label><input id="s-last" type="text" placeholder="e.g. Lee"></div>
-      </div>
-      <div class="fld"><label>Password</label><input id="s-pw" type="password" placeholder="Team password"></div>
-      <button class="btn btn-primary btn-full" onclick="createPatient()">Create new patient</button>
-    </div>
-
-    <div id="tab-load" class="hidden">
-      <div id="today-list"></div>
-      <div class="row2">
-        <div class="fld"><label>First name / shelter no.</label><input id="l-first" type="text" placeholder="e.g. Mochi or SC12345"></div>
-        <div class="fld"><label>Last name</label><input id="l-last" type="text" placeholder="e.g. Lee"></div>
-      </div>
-      <div class="fld"><label>Password</label><input id="l-pw" type="password" placeholder="Team password"></div>
-      <button class="btn btn-primary btn-full" onclick="loadPatient()">Load from this device</button>
-    </div>
-
-    <div id="tab-import" class="hidden">
-      <p style="font-size:13px;color:var(--ink2);margin-bottom:12px;line-height:1.5;">Paste the exported record text from Teams below, then enter the team password.</p>
-      <div class="fld"><label>Paste exported record</label><textarea id="i-text" placeholder="Paste the encrypted text from Teams here…" style="min-height:80px;font-size:11px;font-family:monospace;"></textarea></div>
-      <div class="fld"><label>Password</label><input id="i-pw" type="password" placeholder="Team password"></div>
-      <button class="btn btn-primary btn-full" onclick="importPatient()">Import record</button>
-    </div>
+    <button class="btn btn-primary btn-full" onclick="openOrCreate()">Open / create patient</button>
+    <div id="today-list" style="margin-top:16px;"></div>
   </div>
-  <p style="text-align:center;font-size:11px;color:var(--ink3);margin-top:10px;">When the team cloud is set up, records sync live across devices and auto-clear after 24–48 h.<br>A copy is always saved on this device as a backup.</p>
+  <p style="text-align:center;font-size:11px;color:var(--ink3);margin-top:10px;">Records sync live across devices and auto-clear after 24–48 h.</p>
 </div>
 
 <!-- PATIENT SCREEN -->
@@ -226,7 +201,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0;}
             <div class="fld"><label>Last name</label><input id="p-last" type="text"></div>
             <div class="fld"><label>Weight (kg)</label><input id="p-weight" type="number" step="0.1" placeholder="e.g. 3.5" oninput="updateDoses()"></div>
             <div class="fld"><label>Sex</label><select id="p-sex" onchange="onSexChange()"><option value="">Select…</option><option>Male entire</option><option>Female entire</option></select></div>
-            <div class="fld"><label>Age (months)</label><input id="p-age" type="number" placeholder="e.g. 8"></div>
+            <div class="fld"><label>Age</label><div style="display:flex;gap:6px;"><input id="p-age" type="number" step="0.1" placeholder="e.g. 8" style="flex:1;min-width:0;"><select id="p-age-unit" style="width:96px;flex-shrink:0;"><option value="months">months</option><option value="years">years</option></select></div></div>
             <div class="fld"><label>ASA</label><select id="p-asa"><option value="1">ASA 1 — Healthy</option><option value="2">ASA 2 — Mild systemic disease</option></select></div>
             <div class="fld"><label>BCS category</label><select id="p-bcs-cat"><option value="normal">Normal (3–6/9)</option><option value="underweight">Underweight (≤2/9)</option><option value="overweight">Overweight (≥7/9)</option></select></div>
             <div class="fld"><label>BCS score (1–9)</label><input id="p-bcs" type="number" min="1" max="9" placeholder="e.g. 5"></div>
@@ -637,7 +612,7 @@ function buildTemplate(){
   var scLine=sc?'Closed subcutaneous layer with 3/0 PDS in a continuous suture pattern.\n':'';
   var close='Closed muscle layer with 3/0 PDS in a continuous suture pattern.\n'+scLine+'Closed skin layer with 3/0 PDS in an intradermal suture pattern.';
 
-  if(proc==='castrate')return 'Surgical Procedure:\nRoutine Castration.\nSingle scrotal incisions made and testicles exteriorised.\nPedicle tie performed over both spermatic cords.\nIncisions left open to drain and heal by second intention.';
+  if(proc==='castrate')return 'Surgical Procedure:\nRoutine Castration.\nSingle scrotal incisions made and testicles exteriorised.\nCord tie performed via close castration.\nIncisions left open to drain and heal by second intention.';
 
   if(proc==='cryptorchid'){
     var side=val('crypto-side');
@@ -802,7 +777,7 @@ function collectFormData(){
   return {
     id:ST.patientId,date:ST.date,
     first:val('p-first'),last:val('p-last'),weight:val('p-weight'),sex:val('p-sex'),
-    age:val('p-age'),asa:val('p-asa'),bcsCat:val('p-bcs-cat'),bcs:val('p-bcs'),
+    age:val('p-age'),ageUnit:val('p-age-unit'),asa:val('p-asa'),bcsCat:val('p-bcs-cat'),bcs:val('p-bcs'),
     vet:val('p-vet'),vetOther:val('p-vet-other'),nurse:val('p-nurse'),
     hr:val('p-hr'),rr:val('p-rr'),mm:val('p-mm'),crt:val('p-crt'),
     caMurmur:chk('ca-murmur'),caMurmurGrade:val('ca-murmur-grade'),caGallop:chk('ca-gallop'),caArrhythmia:chk('ca-arrhythmia'),
@@ -827,7 +802,7 @@ function collectFormData(){
 
 function populateForm(d){
   set('p-first',d.first||'');set('p-last',d.last||'');set('p-weight',d.weight||'');set('p-sex',d.sex||'');
-  set('p-age',d.age||'');set('p-asa',d.asa||'1');set('p-bcs-cat',d.bcsCat||'normal');set('p-bcs',d.bcs||'');
+  set('p-age',d.age||'');set('p-age-unit',d.ageUnit||'months');set('p-asa',d.asa||'1');set('p-bcs-cat',d.bcsCat||'normal');set('p-bcs',d.bcs||'');
   set('p-vet',d.vet||'JX');set('p-vet-other',d.vetOther||'');set('p-nurse',d.nurse||'');
   if(d.vet==='Other')show('p-vet-other-row');else hide('p-vet-other-row');
   set('p-hr',d.hr||'');set('p-rr',d.rr||'Normal bronchovesicular sounds');set('p-mm',d.mm||'Pink');set('p-crt',d.crt||'<2s');
@@ -951,6 +926,32 @@ async function loadPatient(){
   flash('No record found for '+first+(last?' '+last:'')+' today. It may be on another device — check the cloud list, or use Import from Teams.','danger');
 }
 
+// Cloud-first entry: open the patient if they exist, otherwise create them.
+async function openOrCreate(){
+  var first=(val('s-first')||'').trim();
+  var last=(val('s-last')||'').trim();
+  if(!first){flash('Enter the name / shelter number','danger');return;}
+  ST.password=APP_KEY;ST.date=nowDate();
+  // Cloud first
+  if(CLOUD.on){
+    var cd=await cloudGetDoc(cloudDocId(first,last,nowDate()),APP_KEY);
+    if(cd){ST.patientId=cd.id||('p_'+Date.now());ST.date=cd.__date||nowDate();populateForm(cd);goPatient();flash('Opened — '+first+(last?' '+last:''));return;}
+  }
+  // Local cache / backup
+  try{
+    var raw=localStorage.getItem(lsKey(first,last,nowDate()));
+    if(raw){var stored=JSON.parse(raw);var d=await decData(stored.enc,APP_KEY);
+      if(d){ST.patientId=d.id;ST.date=stored.date||nowDate();populateForm(d);goPatient();flash('Opened — '+first+(last?' '+last:''));return;}
+    }
+  }catch(e){}
+  // New patient — populateForm with a sparse record resets the whole form to defaults
+  ST.patientId='p_'+Date.now();ST.emgWeight='';
+  populateForm({first:first,last:last});
+  goPatient();
+  flash('New patient — '+first+(last?' '+last:''));
+}
+function pickPatient(f,l){set('s-first',f);set('s-last',l);openOrCreate();}
+
 async function importPatient(){
   var text=(document.getElementById('i-text').value||'').trim();
   var pw=document.getElementById('i-pw').value;
@@ -968,7 +969,7 @@ async function importPatient(){
 }
 
 // ── NAVIGATION ─────────────────────────────────────────────────────────
-function goSearch(){cloudUnsubscribe();document.getElementById('patient-screen').classList.add('hidden');document.getElementById('search-screen').classList.remove('hidden');document.getElementById('sticky-hdr').style.display='none';document.getElementById('emg-fab').style.display='none';}
+function goSearch(){cloudUnsubscribe();document.getElementById('patient-screen').classList.add('hidden');document.getElementById('search-screen').classList.remove('hidden');document.getElementById('sticky-hdr').style.display='none';document.getElementById('emg-fab').style.display='none';cloudListToday();}
 function goPatient(){document.getElementById('search-screen').classList.add('hidden');document.getElementById('patient-screen').classList.remove('hidden');document.getElementById('sticky-hdr').style.display='block';document.getElementById('emg-fab').style.display='inline-flex';cloudSubscribe();}
 
 // ── EXPORT ─────────────────────────────────────────────────────────────
@@ -984,7 +985,7 @@ function buildExportNote(){
   var vet=d.vet==='Other'?d.vetOther:d.vet;
   lines.push('Patient: '+(d.first||'?')+' '+(d.last||''));
   lines.push('Date: '+d.date+'  |  Vet: '+(vet||'?')+'  |  Nurse: '+(d.nurse||'?'));
-  lines.push('Weight: '+(d.weight||'?')+'kg  |  Sex: '+(d.sex||'?')+'  |  Age: '+(d.age||'?')+' months  |  ASA: '+d.asa+'  |  BCS: '+(d.bcs||'?')+'/9 ('+(d.bcsCat||'')+')');
+  lines.push('Weight: '+(d.weight||'?')+'kg  |  Sex: '+(d.sex||'?')+'  |  Age: '+(d.age||'?')+' '+(d.ageUnit||'months')+'  |  ASA: '+d.asa+'  |  BCS: '+(d.bcs||'?')+'/9 ('+(d.bcsCat||'')+')');
   lines.push('');
   lines.push('PRE-OPERATIVE EXAMINATION');lines.push(sep);
   if(d.hr)lines.push('HR: '+d.hr+' bpm');
@@ -1295,6 +1296,9 @@ var FIREBASE_CONFIG = {
   measurementId: "G-VSPJ28JWKS"
 };
 var CLOUD={on:false,db:null,unsub:null,docKey:null,lastSentEnc:null,pendingRemoteEnc:null};
+// Built-in app key (no per-team password). Note: the page is public, so this is
+// light obfuscation, not a secret — real lockdown would use Firebase App Check.
+var APP_KEY='hqhvsn-shelter-key-2026';
 
 function cloudConfigured(){return FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf('PASTE')!==0;}
 function cloudDocId(first,last,date){return ('hqhvsn_'+(first||'').toLowerCase()+'_'+(last||'').toLowerCase()+'_'+(date||nowDate())).replace(/[\/\s.#$\[\]]+/g,'-');}
@@ -1313,7 +1317,7 @@ function cloudInit(){
     try{CLOUD.db.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e){}
     cloudStatus('syncing');
     firebase.auth().signInAnonymously().then(function(){
-      CLOUD.on=true;cloudStatus('synced');cloudPurgeExpired();
+      CLOUD.on=true;cloudStatus('synced');cloudPurgeExpired();cloudListToday();
     }).catch(function(){CLOUD.on=false;cloudStatus('local');});
   }catch(e){CLOUD.on=false;cloudStatus('local');}
 }
@@ -1327,6 +1331,7 @@ async function cloudSave(rec,encBlob){
     await CLOUD.db.collection('patients').doc(id).set({
       enc:encBlob,
       name:((rec.first||'')+' '+(rec.last||'')).trim(),
+      first:rec.first||'',last:rec.last||'',
       date:ST.date,
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       expireAt:firebase.firestore.Timestamp.fromMillis(Date.now()+24*3600*1000)
@@ -1381,17 +1386,20 @@ async function cloudPurgeExpired(){
 }
 
 async function cloudListToday(){
-  if(!CLOUD.on||!CLOUD.db)return;
+  var el=document.getElementById('today-list');if(!el)return;
+  if(!CLOUD.on||!CLOUD.db){el.innerHTML='';return;}
   try{
     var snap=await CLOUD.db.collection('patients').where('date','==',nowDate()).get();
     var items=[];snap.forEach(function(doc){var v=doc.data();if(v.name)items.push(v);});
-    if(!items.length)return;
-    var el=document.getElementById('today-list');
-    el.innerHTML+='<div class="lbl" style="margin:10px 0 8px;">☁︎ Cloud patients today</div>'+items.map(function(p){
-      var n=p.name.split(' ');
-      return '<div class="pt-item" onclick="document.getElementById(\'l-first\').value=\''+n[0]+'\';document.getElementById(\'l-last\').value=\''+(n.slice(1).join(' '))+'\'">'+p.name+' <span>· cloud</span></div>';
+    if(!items.length){el.innerHTML='<p class="hint">No patients in the cloud yet today.</p>';return;}
+    el.innerHTML='<div class="lbl" style="margin-bottom:8px;">☁︎ Patients today (tap to open)</div>'+items.map(function(v){
+      var f0=(v.first!==undefined?v.first:(v.name||'').split(' ')[0])||'';
+      var l0=(v.last!==undefined?v.last:(v.name||'').split(' ').slice(1).join(' '))||'';
+      var f=f0.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      var l=l0.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return '<div class="pt-item" onclick="pickPatient(\''+f+'\',\''+l+'\')">'+(v.name||'')+' <span>· cloud</span></div>';
     }).join('');
-  }catch(e){}
+  }catch(e){el.innerHTML='';}
 }
 
 // Init
